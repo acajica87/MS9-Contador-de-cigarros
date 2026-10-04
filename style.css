@@ -1,0 +1,209 @@
+/* ==========================================
+   1. RESET BÁSICO Y TIPOGRAFÍA
+   ========================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* FONDO GLOBAL: Tono arena/crema muy suave para descansar la vista */
+body {
+  background-color: #f7f5f0;
+  color: #2b2b2b;
+  padding: 20px;
+}
+
+/* ==========================================
+   2. ESTRUCTURA GLOBAL (DASHBOARD LAYOUT)
+   ========================================== */
+.dashboard-global {
+  display: flex;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* PANEL DE CONTROL DE VENTAS (FORMULARIO IZQUIERDO) */
+.panel-control {
+  background-color: #ffffff;
+  width: 350px;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  height: fit-content;
+}
+
+.panel-control h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: #1a1a1a;
+}
+
+.instruccion {
+  font-size: 14px;
+  color: #6e6e6e;
+  margin-bottom: 25px;
+  line-height: 1.4;
+}
+
+/* PANEL VISUAL (DERECHA - EL TABLERO DE MAMÁ) */
+.panel-visual {
+  flex: 1;
+}
+
+.encabezado-dashboard h1 {
+  font-size: 28px;
+  color: #1a1a1a;
+  margin-bottom: 5px;
+}
+
+.encabezado-dashboard p {
+  color: #6e6e6e;
+  margin-bottom: 30px;
+}
+
+/* CUADRÍCULA DE TARJETAS POR MARCA */
+.contenedor-marcas {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(450px, 1fr)
+  ); /* Ancho mínimo mayor para dar espacio a las columnas */
+  gap: 25px;
+}
+
+/* ==========================================
+   3. ENTRADAS DE TEXTO Y BOTONES (UX ENTRADA)
+   ========================================== */
+.grupo-input {
+  margin-bottom: 20px;
+}
+
+.grupo-input label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.grupo-input select,
+.grupo-input input {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px; /* Texto grande para escribir fácil */
+  border: 2px solid #e0dacb;
+  border-radius: 8px;
+  background-color: #faf9f6;
+  color: #2b2b2b;
+  outline: none;
+}
+
+.grupo-input select:focus,
+.grupo-input input:focus {
+  border-color: #8c826e;
+}
+
+/* BOTÓN DE ACCIÓN GIGANTE */
+.btn-actualizar {
+  width: 100%;
+  background-color: #4a453a; /* Tono tierra oscuro, elegante y visible */
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 10px;
+}
+
+.btn-actualizar:hover {
+  background-color: #332f28;
+}
+
+/* ==========================================
+   4. TARJETAS DE MARCAS Y VALORES (UX SALIDA)
+   ========================================== */
+.tarjeta-marca {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  border: 1px solid #eae6dc;
+}
+
+.titulo-marca {
+  font-size: 22px;
+  color: #4a453a;
+  margin-bottom: 18px;
+  text-align: center;
+  border-bottom: 2px solid #f7f5f0;
+  padding-bottom: 8px;
+}
+
+/* CONTENEDORES INTERNOS MODULARES EXCLUSIVOS */
+/* CORRECCIÓN AQUÍ: Agregamos display flex y gap para que se acomoden en 2 columnas lado a lado */
+.tarjeta-marca-contenido {
+  display: flex;
+  gap: 15px;
+}
+
+.sub-seccion {
+  flex: 1; /* Esto obliga a que ambos bloques midan exactamente lo mismo de ancho */
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+/* SECCIÓN CAJETILLAS: Resalta al frente con relieve y sombra color tierra */
+.bloque-cajetillas {
+  background-color: #ffffff;
+  border: 1px solid #e3decb;
+  box-shadow: 0 6px 14px rgba(74, 69, 58, 0.08);
+}
+
+/* SECCIÓN SUELTOS: Fondo plano y opaco que descansa atrás */
+.bloque-sueltos {
+  background-color: #f2efe6;
+  border: 1px dashed #d5ceb9;
+  box-shadow: none;
+}
+
+/* MÉTRICAS INDIVIDUALES INTERNAS */
+.bloque-valor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Línea sutil divisoria vertical interna */
+.divider {
+  border-left: 1px solid rgba(140, 130, 110, 0.15);
+}
+
+/* NÚMEROS MASIVOS PARA LA VISTA DE TU MAMÁ */
+.numero-grande {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+/* Color sutil marrón/óxido para distinguir ventas de existencias rápidamente */
+.color-venda {
+  color: #a45a3c !important;
+}
+
+.etiqueta-chica {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8c826e;
+  text-align: center;
+}

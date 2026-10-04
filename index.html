@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Avanzado de Cigarros</title>
+    <!-- Enlace al archivo de estilos CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="dashboard-global">
+      <!-- ==========================================
+           PANEL DE CONTROL (IZQUIERDA)
+           ========================================== -->
+      <aside class="panel-control">
+        <h2>📋 Cierre de Turno</h2>
+        <p class="instruccion">
+          Registre la marca, las cajetillas vendidas de la libreta y el conteo
+          físico de sueltos que quedan.
+        </p>
+
+        <form id="formulario-inventario" onsubmit="event.preventDefault()">
+          <!-- 1. SELECCIÓN DE MARCA -->
+          <div class="grupo-input">
+            <label for="seleccionar-marca">1. Seleccione la Marca</label>
+            <select id="seleccionar-marca">
+              <option value="marlboro-rojo">Marlboro Rojo</option>
+              <option value="pall-mall">Pall Mall</option>
+              <option value="delicados">Delicados</option>
+            </select>
+          </div>
+
+          <!-- 2. CAJETILLAS VENDIDAS -->
+          <div class="grupo-input">
+            <label for="ventas-cajetillas"
+              >2. Cajetillas Vendidas (Libreta)</label
+            >
+            <input type="number" id="ventas-cajetillas" value="0" min="0" />
+          </div>
+
+          <!-- 3. CIGARROS SUELTOS RESTANTES -->
+          <div class="grupo-input">
+            <label for="sueltos-restantes"
+              >3. Cigarros Sueltos Restantes (Conteo)</label
+            >
+            <input type="number" id="sueltos-restantes" value="0" min="0" />
+          </div>
+
+          <!-- BOTÓN ÚNICO DE ACTUALIZACIÓN -->
+          <button
+            type="button"
+            class="btn-actualizar"
+            onclick="calcularInventarioCierre()"
+          >
+            Actualizar Dashboard
+          </button>
+        </form>
+      </aside>
+
+      <!-- ==========================================
+           DASHBOARD VISUAL (DERECHA - EL TABLERO DE MAMÁ)
+           ========================================== -->
+      <main class="panel-visual">
+        <header class="encabezado-dashboard">
+          <h1>Existencias y Ventas del Día</h1>
+          <p>Monitoreo por tipo de cigarro en bloques visuales paralelos.</p>
+        </header>
+
+        <div class="contenedor-marcas" id="dashboard-marcas">
+          <!-- TARJETA 1: MARLBORO ROJO -->
+          <div class="tarjeta-marca">
+            <h2 class="titulo-marca">Marlboro Rojo</h2>
+
+            <!-- Contenedor Flex para alinear lado a lado -->
+            <div class="tarjeta-marca-contenido">
+              <!-- Bloque de Cajetillas (Izquierda) -->
+              <div class="sub-seccion bloque-cajetillas">
+                <div class="bloque-valor">
+                  <span class="numero-grande" id="cajetillas-inv-marlboro-rojo"
+                    >10</span
+                  >
+                  <span class="etiqueta-chica">Cajetillas en Inv.</span>
+                </div>
+                <div class="bloque-valor divider">
+                  <span
+                    class="numero-grande color-venda"
+                    id="cajetillas-ven-marlboro-rojo"
+                    >0</span
+                  >
+                  <span class="etiqueta-chica">Cajetillas Vendidas</span>
+                </div>
+              </div>
+
+              <!-- Bloque de Sueltos (Derecha) -->
+              <div class="sub-seccion bloque-sueltos">
+                <div class="bloque-valor">
+                  <span class="numero-grande" id="sueltos-inv-marlboro-rojo"
+                    >5</span
+                  >
+                  <span class="etiqueta-chica">Cigarros Sueltos</span>
+                </div>
+                <div class="bloque-valor divider">
+                  <span
+                    class="numero-grande color-venda"
+                    id="sueltos-ven-marlboro-rojo"
+                    >0</span
+                  >
+                  <span class="etiqueta-chica">Cigarros Vendidos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TARJETA 2: PALL MALL -->
+          <div class="tarjeta-marca">
+            <h2 class="titulo-marca">Pall Mall</h2>
+
+            <!-- Contenedor Flex para alinear lado a lado -->
+            <div class="tarjeta-marca-contenido">
+              <!-- Bloque de Cajetillas (Izquierda) -->
+              <div class="sub-seccion bloque-cajetillas">
+                <div class="bloque-valor">
+                  <span class="numero-grande" id="cajetillas-inv-pall-mall"
+                    >10</span
+                  >
+                  <span class="etiqueta-chica">Cajetillas en Inv.</span>
+                </div>
+                <div class="bloque-valor divider">
+                  <span
+                    class="numero-grande color-venda"
+                    id="cajetillas-ven-pall-mall"
+                    >0</span
+                  >
+                  <span class="etiqueta-chica">Cajetillas Vendidas</span>
+                </div>
+              </div>
+
+              <!-- Bloque de Sueltos (Derecha) -->
+              <div class="sub-seccion bloque-sueltos">
+                <div class="bloque-valor">
+                  <span class="numero-grande" id="sueltos-inv-pall-mall"
+                    >5</span
+                  >
+                  <span class="etiqueta-chica">Cigarros Sueltos</span>
+                </div>
+                <div class="bloque-valor divider">
+                  <span
+                    class="numero-grande color-venda"
+                    id="sueltos-ven-pall-mall"
+                    >0</span
+                  >
+                  <span class="etiqueta-chica">Cigarros Vendidos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TARJETA 3: DELICADOS -->
+          <div class="tarjeta-marca">
+            <h2 class="titulo-marca">Delicados</h2>
+
+            <!-- Contenedor Flex para alinear lado a lado -->
+            <div class="tarjeta-marca-contenido">
+              <!-- Bloque de Cajetillas (Izquierda) -->
+              <div class="sub-seccion bloque-cajetillas">
+                <div class="bloque-valor">
+                  <span class="numero-grande" id="cajetillas-inv-delicados"
+                    >10</span
+                  >
+                  <span class="etiqueta-chica">Cajetillas en Inv.</span>
+                </div>
+                <div class="bloque-valor divider">
+                  <span
+                    class="numero-grande color-venda"
+                    id="cajetillas-ven-delicados"
+                    >0</span
+                  >
+                  <span class="etiqueta-chica">Cajetillas Vendidas</span>
+                </div>
+              </div>
+
+              <!-- Bloque de Sueltos (Derecha) -->
+              <div class="sub-seccion bloque-sueltos">
+                <div class="bloque-valor">
+                  <span class="numero-grande" id="sueltos-inv-delicados"
+                    >5</span
+                  >
+                  <span class="etiqueta-chica">Cigarros Sueltos</span>
+                </div>
+                <div class="bloque-valor divider">
+                  <span
+                    class="numero-grande color-venda"
+                    id="sueltos-ven-delicados"
+                    >0</span
+                  >
+                  <span class="etiqueta-chica">Cigarros Vendidos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Enlace al archivo de lógica JavaScript -->
+    <script src="script.js"></script>
+  </body>
+</html>
