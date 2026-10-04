@@ -1,50 +1,100 @@
-// Inventario Inicial de Control (La mañana)
-const inventarioInicial = {
-  "marlboro-rojo": { cajetillas: 10, sueltos: 5 },
-  "pall-mall": { cajetillas: 10, sueltos: 5 },
-  delicados: { cajetillas: 10, sueltos: 5 },
+// CONFIGURACIÓN DE LAS 13 MARCAS REALES DEL NEGOCIO
+const MARCAS_CONFIG = {
+  "marlboro-clavo": "Marlboro Clavo",
+  "marlboro-rojo": "Marlboro Rojo",
+  "marlboro-blossom": "Marlboro Blossom Mix",
+  "marlboro-velvet": "Marlboro Fusion Velvet",
+  "marlboro-ruby": "Marlboro Ruby",
+  "marlboro-garden": "Marlboro Garden Fusion",
+  "marlboro-ice": "Marlboro Ice Mix",
+  "marlboro-capsula": "Marlboro Cápsula",
+  "marlboro-summer": "Marlboro Summer Mix",
+  "marlboro-ruby-mix": "Marlboro Ruby Mix",
+  "baronet-20": "Baronet 20",
+  "baronet-25": "Baronet 25",
+  boots: "Boots",
 };
 
 const CIGARROS_POR_CAJETILLA = 20;
 
-// Estado actual del dashboard (Se almacena de forma persistente)
-let estadoDashboard = JSON.parse(
-  localStorage.getItem("dashboardCigarrosData"),
-) || {
-  "marlboro-rojo": {
-    cajetillasInv: 10,
-    cajetillasVen: 0,
-    sueltosInv: 5,
-    sueltosVen: 0,
-  },
-  "pall-mall": {
-    cajetillasInv: 10,
-    cajetillasVen: 0,
-    sueltosInv: 5,
-    sueltosVen: 0,
-  },
-  delicados: {
-    cajetillasInv: 10,
-    cajetillasVen: 0,
-    sueltosInv: 5,
-    sueltosVen: 0,
-  },
-};
+// Generar el inventario inicial de la mañana para cada una (10 cajetillas y 5 sueltos de base)
+const inventarioInicial = {};
+for (const clave in MARCAS_CONFIG) {
+  inventarioInicial[clave] = { cajetillas: 10, sueltos: 5 };
+}
 
+// Cargar datos previos o inicializar el estado del dashboard
+let estadoDashboard = JSON.parse(localStorage.getItem("dashboardCigarrosData"));
+
+if (!estadoDashboard) {
+  estadoDashboard = {};
+  for (const clave in MARCAS_CONFIG) {
+    estadoDashboard[clave] = {
+      cajetillasInv: 10,
+      cajetillasVen: 0,
+      sueltosInv: 5,
+      sueltosVen: 0,
+    };
+  }
+}
+
+// AL CARGAR LA PÁGINA: Crear las tarjetas HTML de forma dinámica y pintar los datos
 document.addEventListener("DOMContentLoaded", () => {
+  crearTarjetasEnPantalla();
   actualizarPantallaVisual();
 });
 
+// Función inteligente que dibuja las 13 tarjetas en el tablero automáticamente
+function crearTarjetasEnPantalla() {
+  const contenedor = document.getElementById("dashboard-marcas");
+  contenedor.innerHTML = ""; // Limpiar
+
+  for (const clave in MARCAS_CONFIG) {
+    const nombreLegible = MARCAS_CONFIG[clave];
+
+    const tarjetaHTML = `
+            <div class="tarjeta-marca">
+                <h2 class="titulo-marca">${nombreLegible}</h2>
+                <div class="tarjeta-marca-contenido">
+                    
+                    <!-- Bloque de Cajetillas -->
+                    <div class="sub-seccion bloque-cajetillas">
+                        <div class="bloque-valor">
+                            <span class="numero-grande" id="cajetillas-inv-${clave}">0</span>
+                            <span class="etiqueta-chica">Cajetillas en Inv.</span>
+                        </div>
+                        <div class="bloque-valor divider">
+                            <span class="numero-grande color-venda" id="cajetillas-ven-${clave}">0</span>
+                            <span class="etiqueta-chica">Vendidas</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloque de Sueltos -->
+                    <div class="sub-seccion bloque-sueltos">
+                        <div class="bloque-valor">
+                            <span class="numero-grande" id="sueltos-inv-${clave}">0</span>
+                            <span class="etiqueta-chica">Cigarros Sueltos</span>
+                        </div>
+                        <div class="bloque-valor divider">
+                            <span class="numero-grande color-venda" id="sueltos-ven-${clave}">0</span>
+                            <span class="etiqueta-chica">Vendidos</span>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        `;
+    contenedor.innerHTML += tarjetaHTML;
+  }
+}
+
 function calcularInventarioCierre() {
   const marca = document.getElementById("seleccionar-marca").value;
-
-  // Captura de datos ingresados
   const cajetillasVendidasLibreta =
     parseInt(document.getElementById("ventas-cajetillas").value) || 0;
   const sueltosRestantesContados =
     parseInt(document.getElementById("sueltos-restantes").value) || 0;
 
-  // Valores fijos del inicio de la jornada
   const inicialCajetillas = inventarioInicial[marca].cajetillas;
   const inicialSueltos = inventarioInicial[marca].sueltos;
 
@@ -60,21 +110,16 @@ function calcularInventarioCierre() {
     inicialCajetillas - cajetillasVendidasLibreta - cajetillasAbiertas;
 
   // 3. CÁLCULO AUTOMÁTICO DE CIGARROS SUELTOS VENDIDOS
-  // Convertimos todo lo inicial y final a unidades individuales para saber exactamente qué se vendió
   const totalCigarrosIniciales =
     inicialCajetillas * CIGARROS_POR_CAJETILLA + inicialSueltos;
   const totalCigarrosFinales =
     cajetillasQuedan * CIGARROS_POR_CAJETILLA + sueltosRestantesContados;
-
   const totalCigarrosVendidosEnElDia =
     totalCigarrosIniciales - totalCigarrosFinales;
-
-  // De ese gran total vendido, le restamos lo que se vendió en cajetillas cerradas para aislar las unidades sueltas vendidas
   const sueltosVendidosCalculados =
     totalCigarrosVendidosEnElDia -
     cajetillasVendidasLibreta * CIGARROS_POR_CAJETILLA;
 
-  // Validación por si hay un error de dedo en la captura
   if (cajetillasQuedan < 0 || sueltosVendidosCalculados < 0) {
     alert(
       "¡Error en el conteo! Las ventas y el inventario restante superan el stock inicial.",
@@ -88,13 +133,12 @@ function calcularInventarioCierre() {
   estadoDashboard[marca].sueltosInv = sueltosRestantesContados;
   estadoDashboard[marca].sueltosVen = sueltosVendidosCalculados;
 
-  // 5. PERSISTENCIA EN EL NAVEGADOR
+  // 5. PERSISTENCIA
   localStorage.setItem(
     "dashboardCigarrosData",
     JSON.stringify(estadoDashboard),
   );
 
-  // Refrescar paneles visuales
   actualizarPantallaVisual();
 
   // Limpiar formulario
