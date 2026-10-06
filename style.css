@@ -250,3 +250,23 @@ body {
   font-weight: 300;
   margin: 0 5px;
 }
+/* BOTÓN DE REPORTE */
+.btn-reporte {
+  width: 100%;
+  background-color: #ffffff;
+  color: #4a453a;
+  border: 2px solid #4a453a;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-reporte:hover {
+  background-color: #f2efe6;
+  border-color: #332f28;
+  color: #332f28;
+}

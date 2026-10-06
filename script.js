@@ -200,3 +200,66 @@ function actualizarTiempo() {
     document.getElementById("hora-actual").innerText = horaTexto;
   }
 }
+// ==========================================
+// 6. GENERACIÓN DE REPORTE DEL DÍA CORREGIDO
+// ==========================================
+function generarReporteDelDia() {
+  const ahora = new Date();
+  const opcionesFecha = { year: "numeric", month: "long", day: "numeric" };
+  const fechaTexto = ahora.toLocaleDateString("es-MX", opcionesFecha);
+  const horaTexto = ahora.toLocaleTimeString("es-MX", { hour12: false });
+
+  let contenidoReporte = `=========================================\n`;
+  contenidoReporte += `       REPORTE DE MOVIMIENTOS DEL DÍA    \n`;
+  contenidoReporte += `=========================================\n`;
+  contenidoReporte += `Fecha: ${fechaTexto}\n`;
+  contenidoReporte += `Hora de Corte: ${horaTexto}\n`;
+  contenidoReporte += `-----------------------------------------\n\n`;
+
+  let huboMovimientos = false;
+
+  // Recorremos las 13 marcas configuradas
+  for (const clave in MARCAS_CONFIG) {
+    const nombreMarca = MARCAS_CONFIG[clave];
+
+    // CORRECCIÓN PROTECTORA: Si el estado de la marca no existe en la memoria local,
+    // le creamos una plantilla vacía temporal con ceros para que no truene el código.
+    const data = estadoDashboard[clave] || {
+      cajetillasInv: 10,
+      cajetillasVen: 0,
+      sueltosInv: 5,
+      sueltosVen: 0,
+    };
+
+    // Evaluamos los movimientos usando la variable segura "data"
+    if (data.cajetillasVen > 0 || data.sueltosVen > 0) {
+      huboMovimientos = true;
+      contenidoReporte += `📌 MARCA: ${nombreMarca}\n`;
+      contenidoReporte += `   - Cajetillas Vendidas: ${data.cajetillasVen}\n`;
+      contenidoReporte += `   - Cigarros Sueltos Vendidos: ${data.sueltosVen}\n`;
+      contenidoReporte += `   - STOCK ACTUAL EN TIENDA: ${data.cajetillasInv} Cajetillas y ${data.sueltosInv} Sueltos\n`;
+      contenidoReporte += `-----------------------------------------\n`;
+    }
+  }
+
+  if (!huboMovimientos) {
+    contenidoReporte += `No se registraron ventas ni movimientos de inventario el día de hoy.\n`;
+  }
+
+  contenidoReporte += `\n=========================================\n`;
+  contenidoReporte += `         Fin del Reporte - ¡Buen descanso! \n`;
+
+  // OPERACIÓN DE DESCARGA AUTOMÁTICA
+  const blob = new Blob([contenidoReporte], {
+    type: "text/plain;charset=utf-8",
+  });
+  const enlaceDescarga = document.createElement("a");
+  const nombreArchivo = `Reporte_Cigarros_${fechaTexto.replace(/ /g, "_")}.txt`;
+
+  enlaceDescarga.href = URL.createObjectURL(blob);
+  enlaceDescarga.download = nombreArchivo;
+
+  document.body.appendChild(enlaceDescarga);
+  enlaceDescarga.click();
+  document.body.removeChild(enlaceDescarga);
+}
