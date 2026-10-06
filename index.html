@@ -4,11 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Avanzado de Cigarros con Historial</title>
-    <!-- Vinculación del archivo de estilos -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- BARRA SUPERIOR COMPLETA (ANCHO DE PÁGINA) -->
+    <!-- BARRA SUPERIOR COMPLETA (RELOJ DIGITAL) -->
     <div class="barra-superior-reloj">
       <div class="reloj-contenido">
         <span class="reloj-icono">🕒</span>
@@ -18,7 +17,7 @@
       </div>
     </div>
 
-    <!-- CONTENEDOR CENTRAL DEL DASHBOARD (FLEXBOX) -->
+    <!-- CONTENEDOR CENTRAL DEL DASHBOARD -->
     <div class="dashboard-global">
       <!-- PANEL DE CONTROL DE CAPTURA (IZQUIERDA) -->
       <aside class="panel-control">
@@ -29,10 +28,11 @@
         </p>
 
         <form id="formulario-inventario" onsubmit="event.preventDefault()">
-          <!-- 1. Menú de Marcas -->
+          <!-- Menú de Marcas (Incluye Camel) -->
           <div class="grupo-input">
             <label for="seleccionar-marca">1. Seleccione la Marca</label>
             <select id="seleccionar-marca">
+              <option value="camel">Camel</option>
               <option value="marlboro-clavo">Marlboro Clavo</option>
               <option value="marlboro-rojo">Marlboro Rojo</option>
               <option value="marlboro-blossom">Marlboro Blossom Mix</option>
@@ -49,7 +49,6 @@
             </select>
           </div>
 
-          <!-- 2. Sección Mañana -->
           <div class="form-section-separator">
             A. Inventario Inicial (Mañana)
           </div>
@@ -62,7 +61,6 @@
             <input type="number" id="inicial-sueltos" value="0" min="0" />
           </div>
 
-          <!-- 3. Sección Noche -->
           <div class="form-section-separator">B. Inventario Final (Noche)</div>
           <div class="grupo-input">
             <label for="inventario-cajetillas">Cajetillas Restantes</label>
@@ -73,7 +71,6 @@
             <input type="number" id="sueltos-restantes" value="0" min="0" />
           </div>
 
-          <!-- Botones -->
           <button
             type="button"
             class="btn-actualizar"
@@ -84,9 +81,9 @@
           <button
             type="button"
             class="btn-reporte"
-            onclick="generarReporteDelDia()"
+            onclick="imprimirTicketDelDia()"
           >
-            📥 Descargar Reporte (.TXT)
+            🖨️ Imprimir Ticket de Corte
           </button>
         </form>
       </aside>
@@ -103,19 +100,56 @@
         </div>
       </main>
     </div>
-    <!-- FIN DEL CONTENEDOR GLOBAL -->
 
-    <!-- SECCIÓN INFERIOR INDEPENDIENTE: PANEL DE REGISTROS HISTÓRICOS -->
+    <!-- SECCIÓN INFERIOR: HISTORIAL CON FILTROS AVANZADOS -->
     <div class="contenedor-historial">
-      <div class="historial-header">
-        <h2>📜 Registro Histórico de Movimientos</h2>
-        <button
-          class="btn-borrar-historial"
-          onclick="borrarHistorialPermanente()"
-        >
-          Limpiar Historial
-        </button>
+      <div class="historial-header-filtros">
+        <h2>📜 Historial de Movimientos</h2>
+
+        <!-- Barra de Filtros Interactiva -->
+        <div class="barra-filtros">
+          <div class="filtro-item">
+            <label for="filtro-fecha">Filtrar por Fecha:</label>
+            <input
+              type="date"
+              id="filtro-fecha"
+              onchange="mostrarHistorialEnTabla()"
+            />
+          </div>
+          <div class="filtro-item">
+            <label for="filtro-marca">Filtrar por Marca:</label>
+            <select id="filtro-marca" onchange="mostrarHistorialEnTabla()">
+              <option value="todas">-- Todas las Marcas --</option>
+              <option value="Camel">Camel</option>
+              <option value="Marlboro Clavo">Marlboro Clavo</option>
+              <option value="Marlboro Rojo">Marlboro Rojo</option>
+              <option value="Marlboro Blossom Mix">Marlboro Blossom Mix</option>
+              <option value="Marlboro Fusion Velvet">
+                Marlboro Fusion Velvet
+              </option>
+              <option value="Marlboro Ruby">Marlboro Ruby</option>
+              <option value="Marlboro Garden Fusion">
+                Marlboro Garden Fusion
+              </option>
+              <option value="Marlboro Ice Mix">Marlboro Ice Mix</option>
+              <option value="Marlboro Cápsula">Marlboro Cápsula</option>
+              <option value="Marlboro Summer Mix">Marlboro Summer Mix</option>
+              <option value="Marlboro Ruby Mix">Marlboro Ruby Mix</option>
+              <option value="Baronet 20">Baronet 20</option>
+              <option value="Baronet 25">Baronet 25</option>
+              <option value="Boots">Boots</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            class="btn-limpiar-filtros"
+            onclick="limpiarFiltrosVisuales()"
+          >
+            Mostrar Todo
+          </button>
+        </div>
       </div>
+
       <div class="tabla-scroll">
         <table class="tabla-movimientos">
           <thead>
@@ -129,13 +163,12 @@
             </tr>
           </thead>
           <tbody id="lista-historial-filas">
-            <!-- Las filas se insertarán permanentemente aquí -->
+            <!-- Filas dinámicas -->
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Enlace al archivo de lógica JavaScript -->
     <script src="script.js"></script>
   </body>
 </html>

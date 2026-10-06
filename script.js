@@ -1,7 +1,8 @@
 // ==========================================
-// 1. CONFIGURACIÓN DE LAS 13 MARCAS REALES
+// 1. CONFIGURACIÓN ACTUALIZADA CON CAMEL
 // ==========================================
 const MARCAS_CONFIG = {
+  camel: "Camel",
   "marlboro-clavo": "Marlboro Clavo",
   "marlboro-rojo": "Marlboro Rojo",
   "marlboro-blossom": "Marlboro Blossom Mix",
@@ -19,13 +20,12 @@ const MARCAS_CONFIG = {
 
 const CIGARROS_POR_CAJETILLA = 20;
 
-// Estado actual del dashboard e Historial permanente
 let estadoDashboard =
   JSON.parse(localStorage.getItem("dashboardCigarrosData")) || {};
 let registroHistorico =
   JSON.parse(localStorage.getItem("historialMovimientosCigarros")) || [];
 
-// Inicializar marcas vacías si no existen en la memoria
+// Asegurar que cada marca exista en el objeto de datos
 for (const clave in MARCAS_CONFIG) {
   if (!estadoDashboard[clave]) {
     estadoDashboard[clave] = {
@@ -38,22 +38,33 @@ for (const clave in MARCAS_CONFIG) {
 }
 
 // ==========================================
-// 2. EVENTO DE ARRANQUE E INTERFAZ
+// 2. CONTROL DE ARRANQUE E INTERFAZ
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  // Iniciar reloj dinámico cada segundo
-  actualizarTiempo();
-  setInterval(actualizarTiempo, 1000);
+  iniciarReloj();
+  crearTarjetasEnPantalla();
+  actualizarPantallaVisual();
+  mostrarHistorialEnTabla();
+});
 
-  // Crear la estructura de tarjetas en el tablero
+// ==========================================
+// 3. GENERADOR DINÁMICO DE TARJETAS HTML
+// ==========================================
+function crearTarjetasEnPantalla() {
   const contenedor = document.getElementById("dashboard-marcas");
-  if (contenedor) {
-    contenedor.innerHTML = Object.keys(MARCAS_CONFIG)
-      .map(
-        (clave) => `
+  if (!contenedor) return;
+
+  contenedor.innerHTML = ""; // Limpiar antes de renderizar
+
+  for (const clave in MARCAS_CONFIG) {
+    const nombreLegible = MARCAS_CONFIG[clave];
+
+    const tarjetaHTML = `
             <div class="tarjeta-marca">
-                <h2 class="titulo-marca">${MARCAS_CONFIG[clave]}</h2>
+                <h2 class="titulo-marca">${nombreLegible}</h2>
                 <div class="tarjeta-marca-contenido">
+                    
+                    <!-- Bloque de Cajetillas (Izquierda) -->
                     <div class="sub-seccion bloque-cajetillas">
                         <div class="bloque-valor">
                             <span class="numero-grande" id="cajetillas-inv-${clave}">0</span>
@@ -64,6 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             <span class="etiqueta-chica">Vendidas</span>
                         </div>
                     </div>
+
+                    <!-- Bloque de Sueltos (Derecha) -->
                     <div class="sub-seccion bloque-sueltos">
                         <div class="bloque-valor">
                             <span class="numero-grande" id="sueltos-inv-${clave}">0</span>
@@ -74,19 +87,16 @@ document.addEventListener("DOMContentLoaded", () => {
                             <span class="etiqueta-chica">Vendidos</span>
                         </div>
                     </div>
+                    
                 </div>
             </div>
-        `,
-      )
-      .join("");
+        `;
+    contenedor.innerHTML += tarjetaHTML;
   }
-
-  actualizarPantallaVisual();
-  mostrarHistorialEnTabla();
-});
+}
 
 // ==========================================
-// 3. LÓGICA DE AUDITORÍA Y CÁLCULO
+// 4. LÓGICA MATEMÁTICA REAL BASADA EN ENTRADAS
 // ==========================================
 function calcularInventarioCierre() {
   const marca = document.getElementById("seleccionar-marca").value;
@@ -120,7 +130,7 @@ function calcularInventarioCierre() {
   const sueltosVendidosCalculados =
     totalCigarrosVendidos % CIGARROS_POR_CAJETILLA;
 
-  // Guardar en las variables globales
+  // Guardar en el objeto de datos del Dashboard
   estadoDashboard[marca] = {
     cajetillasInv: cajetillasRestantesContadas,
     cajetillasVen: cajetillasVendidasCalculadas,
@@ -128,9 +138,12 @@ function calcularInventarioCierre() {
     sueltosVen: sueltosVendidosCalculados,
   };
 
-  // Añadir fila al historial acumulativo
+  // Crear fila con marca de tiempo exacta para los filtros
   const ahora = new Date();
-  const tiempoMarcado = `${ahora.toLocaleDateString("es-MX")} | ${ahora.toLocaleTimeString("es-MX", { hour12: false })}`;
+  const dia = String(ahora.getDate()).padStart(2, "0");
+  const mes = String(ahora.getMonth() + 1).padStart(2, "0");
+  const año = ahora.getFullYear();
+  const tiempoMarcado = `${año}-${mes}-${dia} | ${ahora.toLocaleTimeString("es-MX", { hour12: false })}`;
 
   registroHistorico.unshift({
     fecha: tiempoMarcado,
@@ -139,9 +152,10 @@ function calcularInventarioCierre() {
     final: `${cajetillasRestantesContadas}c / ${sueltosRestantesContados}s`,
     cajetillasV: cajetillasVendidasCalculadas,
     sueltosV: sueltosVendidosCalculados,
+    fechaFiltro: `${año}-${mes}-${dia}`,
   });
 
-  // Guardar en la base de datos del navegador
+  // Guardar permanentemente en LocalStorage
   localStorage.setItem(
     "dashboardCigarrosData",
     JSON.stringify(estadoDashboard),
@@ -162,7 +176,114 @@ function calcularInventarioCierre() {
 }
 
 // ==========================================
-// 4. AUXILIARES DE RENDERIZADO VISUAL
+// 5. SISTEMA DE FILTRADO AVANZADO
+// ==========================================
+function mostrarHistorialEnTabla() {
+  const tbody = document.getElementById("lista-historial-filas");
+  if (!tbody) return;
+
+  const filtroFecha = document.getElementById("filtro-fecha").value;
+  const filtroMarca = document.getElementById("filtro-marca").value;
+
+  const registrosFiltrados = registroHistorico.filter((mov) => {
+    const coincideFecha = !filtroFecha || mov.fechaFiltro === filtroFecha;
+    const coincideMarca = filtroMarca === "todas" || mov.nombre === filtroMarca;
+    return coincideFecha && coincideMarca;
+  });
+
+  tbody.innerHTML = ""; // Limpiar la tabla anterior
+
+  // Renderizar las filas filtradas
+  for (let i = 0; i < registrosFiltrados.length; i++) {
+    const mov = registrosFiltrados[i];
+    const filaHTML = `
+            <tr>
+                <td style="font-family: monospace; font-size:13px;">${mov.fecha}</td>
+                <td style="font-weight: 600;">${mov.nombre}</td>
+                <td>${mov.inicial}</td>
+                <td>${mov.final}</td>
+                <td style="color:#a45a3c; font-weight:bold;">${mov.cajetillasV}</td>
+                <td style="color:#a45a3c; font-weight:bold;">${mov.sueltosV}</td>
+            </tr>
+        `;
+    tbody.innerHTML += filaHTML;
+  }
+}
+
+function limpiarFiltrosVisuales() {
+  document.getElementById("filtro-fecha").value = "";
+  document.getElementById("filtro-marca").value = "todas";
+  mostrarHistorialEnTabla();
+}
+
+// ==========================================
+// 6. IMPRESIÓN DE TICKET TÉRMICO (80mm)
+// ==========================================
+function imprimirTicketDelDia() {
+  const ahora = new Date();
+  const fechaTexto = ahora.toLocaleDateString("es-MX", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const horaTexto = ahora.toLocaleTimeString("es-MX", { hour12: false });
+
+  const ventanaTicket = window.open("", "_blank", "width=350,height=600");
+
+  let lineasProductos = "";
+  let huboVentas = false;
+
+  for (const clave in MARCAS_CONFIG) {
+    const data = estadoDashboard[clave];
+    if (data && (data.cajetillasVen > 0 || data.sueltosVen > 0)) {
+      huboVentas = true;
+      lineasProductos += `
+                <div class="ticket-linea-prod">
+                    <strong>${MARCAS_CONFIG[clave]}</strong><br>
+                    <span>  Vendidos: ${data.cajetillasVen}c / ${data.sueltosVen}s</span><br>
+                    <span class="stock-ticket">  Stock: ${data.cajetillasInv}c / ${data.sueltosInv}s</span>
+                </div>
+                <div class="linea-puntos">--------------------------------</div>
+            `;
+    }
+  }
+
+  if (!huboVentas) lineasProductos = "<div>No se registraron ventas hoy.</div>";
+
+  ventanaTicket.document.write(`
+        <html>
+        <head>
+            <title>Ticket de Corte</title>
+            <style>
+                body { font-family: 'Courier New', monospace; width: 280px; margin: 0; padding: 10px; color: #000; font-size: 14px; }
+                .text-center { text-align: center; }
+                .titulo { font-size: 16px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+                .linea-puntos { border-bottom: 1px dashed #000; margin: 10px 0; }
+                .ticket-linea-prod { margin-bottom: 8px; line-height: 1.3; }
+.stock-ticket { font-size: 12px; color: #444; }
+@media print { body { margin: 0; } }
+
+
+
+MINISUPER 9
+CORTE DE CIGARROS
+--------------------------------
+FECHA: ${fechaTexto}
+HORA : ${horaTexto}
+--------------------------------
+${lineasProductos}
+¡CORTE EXITOSO!
+Buen descanso.
+
+
+`);
+  ventanaTicket.document.close();
+  ventanaTicket.focus();
+  ventanaTicket.print();
+  ventanaTicket.close();
+}
+// ==========================================
+// 7. AUXILIARES VISUALES Y RELOJ
 // ==========================================
 function actualizarPantallaVisual() {
   for (const marca in estadoDashboard) {
@@ -179,26 +300,10 @@ function actualizarPantallaVisual() {
     }
   }
 }
-
-function mostrarHistorialEnTabla() {
-  const tbody = document.getElementById("lista-historial-filas");
-  if (!tbody) return;
-  tbody.innerHTML = registroHistorico
-    .map(
-      (mov) => `
-        <tr>
-            <td style="font-family: monospace; font-size:13px;">${mov.fecha}</td>
-            <td style="font-weight: 600;">${mov.nombre}</td>
-            <td>${mov.inicial}</td>
-            <td>${mov.final}</td>
-            <td style="color:#a45a3c; font-weight:bold;">${mov.cajetillasV}</td>
-            <td style="color:#a45a3c; font-weight:bold;">${mov.sueltosV}</td>
-        </tr>
-    `,
-    )
-    .join("");
+function iniciarReloj() {
+  actualizarTiempo();
+  setInterval(actualizarTiempo, 1000);
 }
-
 function actualizarTiempo() {
   const ahora = new Date();
   const opcionesFecha = {
@@ -209,7 +314,6 @@ function actualizarTiempo() {
   };
   let fechaTexto = ahora.toLocaleDateString("es-MX", opcionesFecha);
   fechaTexto = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
-
   if (document.getElementById("fecha-actual")) {
     document.getElementById("fecha-actual").innerText = fechaTexto;
     document.getElementById("hora-actual").innerText = ahora.toLocaleTimeString(
@@ -217,61 +321,4 @@ function actualizarTiempo() {
       { hour12: false },
     );
   }
-}
-
-function borrarHistorialPermanente() {
-  if (
-    confirm(
-      "¿Está seguro de que desea borrar todos los registros históricos? Esta acción no se puede deshacer.",
-    )
-  ) {
-    registroHistorico = [];
-    localStorage.removeItem("historialMovimientosCigarros");
-    mostrarHistorialEnTabla();
-  }
-}
-
-function generarReporteDelDia() {
-  const ahora = new Date();
-  const fechaTexto = ahora.toLocaleDateString("es-MX", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  let contenidoReporte = `=========================================\n`;
-  contenidoReporte += `       REPORTE DE MOVIMIENTOS DEL DÍA    \n`;
-  contenidoReporte += `=========================================\n`;
-  contenidoReporte += `Fecha: ${fechaTexto}\n\n`;
-
-  let huboMovimientos = false;
-  for (const clave in MARCAS_CONFIG) {
-    const data = estadoDashboard[clave] || {
-      cajetillasInv: 0,
-      cajetillasVen: 0,
-      sueltosInv: 0,
-      sueltosVen: 0,
-    };
-    if (data.cajetillasVen > 0 || data.sueltosVen > 0) {
-      huboMovimientos = true;
-      contenidoReporte += `📌 MARCA: ${MARCAS_CONFIG[clave]}\n`;
-      contenidoReporte += `   - Cajetillas Vendidas: ${data.cajetillasVen}\n`;
-      contenidoReporte += `   - Cigarros Sueltos Vendidos: ${data.sueltosVen}\n`;
-      contenidoReporte += `   - STOCK ACTUAL: ${data.cajetillasInv}c y ${data.sueltosInv}s\n`;
-      contenidoReporte += `-----------------------------------------\n`;
-    }
-  }
-
-  if (!huboMovimientos)
-    contenidoReporte += `No se registraron ventas el día de hoy.\n`;
-
-  const blob = new Blob([contenidoReporte], {
-    type: "text/plain;charset=utf-8",
-  });
-  const enlaceDescarga = document.createElement("a");
-  enlaceDescarga.href = URL.createObjectURL(blob);
-  enlaceDescarga.download = `Reporte_${fechaTexto.replace(/ /g, "_")}.txt`;
-  document.body.appendChild(enlaceDescarga);
-  enlaceDescarga.click();
-  document.body.removeChild(enlaceDescarga);
 }
