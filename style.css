@@ -207,3 +207,46 @@ body {
   color: #8c826e;
   text-align: center;
 }
+/* ==========================================
+   5. BARRA DE RELOJ SUPERIOR EXTENDIDA (ANCHO COMPLETO)
+   ========================================== */
+.barra-superior-reloj {
+  background-color: #ffffff;
+  width: 100%;
+  padding: 15px 30px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  border: 1px solid #eae6dc;
+  box-shadow: 0 2px 8px rgba(74, 69, 58, 0.04);
+}
+
+.reloj-contenido {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center; /* Centra el contenido a lo largo de la barra */
+  align-items: center;
+  gap: 12px;
+  font-size: 18px; /* Texto más grande y visible */
+  font-weight: 600;
+  color: #4a453a;
+}
+
+.reloj-icono {
+  font-size: 20px;
+}
+
+#hora-actual {
+  background-color: #f2efe6;
+  padding: 4px 12px;
+  border-radius: 8px;
+  color: #1a1a1a;
+  font-family: monospace; /* Evita que los números bailen */
+  letter-spacing: 1px;
+}
+
+.separador-barra {
+  color: #d5ceb9;
+  font-weight: 300;
+  margin: 0 5px;
+}

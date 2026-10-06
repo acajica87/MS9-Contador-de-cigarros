@@ -1,4 +1,6 @@
-// CONFIGURACIÓN DE LAS 13 MARCAS REALES DEL NEGOCIO
+// ==========================================
+// 1. CONFIGURACIÓN DE LAS 13 MARCAS REALES
+// ==========================================
 const MARCAS_CONFIG = {
   "marlboro-clavo": "Marlboro Clavo",
   "marlboro-rojo": "Marlboro Rojo",
@@ -17,13 +19,13 @@ const MARCAS_CONFIG = {
 
 const CIGARROS_POR_CAJETILLA = 20;
 
-// Generar el inventario inicial de la mañana para cada una (10 cajetillas y 5 sueltos de base)
+// Inventario inicial fijo de la mañana para control de deducción (10 cajetillas y 5 sueltos base)
 const inventarioInicial = {};
 for (const clave in MARCAS_CONFIG) {
   inventarioInicial[clave] = { cajetillas: 10, sueltos: 5 };
 }
 
-// Cargar datos previos o inicializar el estado del dashboard
+// Intentar cargar datos previos guardados en el almacenamiento del navegador
 let estadoDashboard = JSON.parse(localStorage.getItem("dashboardCigarrosData"));
 
 if (!estadoDashboard) {
@@ -38,26 +40,31 @@ if (!estadoDashboard) {
   }
 }
 
-// AL CARGAR LA PÁGINA: Crear las tarjetas HTML de forma dinámica y pintar los datos
+// ==========================================
+// 2. CONTROL DE EVENTO DE ARRANQUE (UX)
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
+  iniciarReloj();
   crearTarjetasEnPantalla();
   actualizarPantallaVisual();
 });
 
-// Función inteligente que dibuja las 13 tarjetas en el tablero automáticamente
+// ==========================================
+// 3. GENERADOR DINÁMICO DE TARJETAS HTML
+// ==========================================
 function crearTarjetasEnPantalla() {
   const contenedor = document.getElementById("dashboard-marcas");
-  contenedor.innerHTML = ""; // Limpiar
+  if (!contenedor) return;
+  contenedor.innerHTML = "";
 
   for (const clave in MARCAS_CONFIG) {
     const nombreLegible = MARCAS_CONFIG[clave];
-
     const tarjetaHTML = `
             <div class="tarjeta-marca">
                 <h2 class="titulo-marca">${nombreLegible}</h2>
                 <div class="tarjeta-marca-contenido">
                     
-                    <!-- Bloque de Cajetillas -->
+                    <!-- Bloque de Cajetillas (Izquierda con Relieve) -->
                     <div class="sub-seccion bloque-cajetillas">
                         <div class="bloque-valor">
                             <span class="numero-grande" id="cajetillas-inv-${clave}">0</span>
@@ -69,7 +76,7 @@ function crearTarjetasEnPantalla() {
                         </div>
                     </div>
 
-                    <!-- Bloque de Sueltos -->
+                    <!-- Bloque de Sueltos (Derecha Plano Contrastante) -->
                     <div class="sub-seccion bloque-sueltos">
                         <div class="bloque-valor">
                             <span class="numero-grande" id="sueltos-inv-${clave}">0</span>
@@ -88,52 +95,57 @@ function crearTarjetasEnPantalla() {
   }
 }
 
+// ==========================================
+// 4. LÓGICA MATEMÁTICA BASADA EN CONTEO FÍSICO
+// ==========================================
 function calcularInventarioCierre() {
   const marca = document.getElementById("seleccionar-marca").value;
-  const cajetillasVendidasLibreta =
-    parseInt(document.getElementById("ventas-cajetillas").value) || 0;
+
+  // Captura de lo que se contó físicamente al cierre del día
+  const cajetillasRestantesContadas =
+    parseInt(document.getElementById("inventario-cajetillas").value) || 0;
   const sueltosRestantesContados =
     parseInt(document.getElementById("sueltos-restantes").value) || 0;
 
   const inicialCajetillas = inventarioInicial[marca].cajetillas;
   const inicialSueltos = inventarioInicial[marca].sueltos;
 
-  // 1. DEDUCCIÓN AUTOMÁTICA DE APERTURA DE CAJETILLAS
-  let cajetillasAbiertas = 0;
-  if (sueltosRestantesContados > inicialSueltos) {
-    const diferenciaSueltos = sueltosRestantesContados - inicialSueltos;
-    cajetillasAbiertas = Math.ceil(diferenciaSueltos / CIGARROS_POR_CAJETILLA);
-  }
-
-  // 2. CÁLCULO DE CAJETILLAS FINALES EN INVENTARIO
-  const cajetillasQuedan =
-    inicialCajetillas - cajetillasVendidasLibreta - cajetillasAbiertas;
-
-  // 3. CÁLCULO AUTOMÁTICO DE CIGARROS SUELTOS VENDIDOS
-  const totalCigarrosIniciales =
+  // --- CÁLCULO DEDUCTIVO POR CONVERSIONES ---
+  // 1. Convertimos todo el stock de la mañana a cigarros sueltos totales
+  const totalCigarrosMañana =
     inicialCajetillas * CIGARROS_POR_CAJETILLA + inicialSueltos;
-  const totalCigarrosFinales =
-    cajetillasQuedan * CIGARROS_POR_CAJETILLA + sueltosRestantesContados;
-  const totalCigarrosVendidosEnElDia =
-    totalCigarrosIniciales - totalCigarrosFinales;
-  const sueltosVendidosCalculados =
-    totalCigarrosVendidosEnElDia -
-    cajetillasVendidasLibreta * CIGARROS_POR_CAJETILLA;
 
-  if (cajetillasQuedan < 0 || sueltosVendidosCalculados < 0) {
+  // 2. Convertimos todo el stock que se contó en la noche a cigarros sueltos totales
+  const totalCigarrosNoche =
+    cajetillasRestantesContadas * CIGARROS_POR_CAJETILLA +
+    sueltosRestantesContados;
+
+  // 3. La diferencia absoluta es el total de cigarros vendidos en el día
+  const totalCigarrosVendidos = totalCigarrosMañana - totalCigarrosNoche;
+
+  if (totalCigarrosVendidos < 0) {
     alert(
-      "¡Error en el conteo! Las ventas y el inventario restante superan el stock inicial.",
+      "¡Error en el conteo! Hay más producto registrado en la noche del que había en la mañana.",
     );
     return;
   }
 
-  // 4. GUARDAR RESULTADOS EN EL ESTADO
-  estadoDashboard[marca].cajetillasInv = cajetillasQuedan;
-  estadoDashboard[marca].cajetillasVen = cajetillasVendidasLibreta;
+  // 4. DEDUCIR CUÁNTAS CAJETILLAS ENTERAS Y CUÁNTOS SUELTOS SE VENDIERON
+  // Las cajetillas vendidas se obtienen dividiendo el total vendido entre 20
+  const cajetillasVendidasCalculadas = Math.floor(
+    totalCigarrosVendidos / CIGARROS_POR_CAJETILLA,
+  );
+  // El sobrante de esa división son los cigarros sueltos individuales vendidos
+  const sueltosVendidosCalculados =
+    totalCigarrosVendidos % CIGARROS_POR_CAJETILLA;
+
+  // Guardar los nuevos valores en nuestro estado del Dashboard
+  estadoDashboard[marca].cajetillasInv = cajetillasRestantesContadas;
+  estadoDashboard[marca].cajetillasVen = cajetillasVendidasCalculadas;
   estadoDashboard[marca].sueltosInv = sueltosRestantesContados;
   estadoDashboard[marca].sueltosVen = sueltosVendidosCalculados;
 
-  // 5. PERSISTENCIA
+  // Guardado persistente local en el navegador
   localStorage.setItem(
     "dashboardCigarrosData",
     JSON.stringify(estadoDashboard),
@@ -141,8 +153,8 @@ function calcularInventarioCierre() {
 
   actualizarPantallaVisual();
 
-  // Limpiar formulario
-  document.getElementById("ventas-cajetillas").value = 0;
+  // Limpiar el formulario de captura
+  document.getElementById("inventario-cajetillas").value = 0;
   document.getElementById("sueltos-restantes").value = 0;
 }
 
@@ -160,5 +172,31 @@ function actualizarPantallaVisual() {
       document.getElementById(`sueltos-ven-${marca}`).innerText =
         data.sueltosVen;
     }
+  }
+}
+
+// ==========================================
+// 5. RELOJ DIGITAL Y FECHA EN TIEMPO REAL
+// ==========================================
+function iniciarReloj() {
+  actualizarTiempo();
+  setInterval(actualizarTiempo, 1000);
+}
+
+function actualizarTiempo() {
+  const ahora = new Date();
+  const opcionesFecha = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  let fechaTexto = ahora.toLocaleDateString("es-MX", opcionesFecha);
+  fechaTexto = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
+  const horaTexto = ahora.toLocaleTimeString("es-MX", { hour12: false });
+
+  if (document.getElementById("fecha-actual")) {
+    document.getElementById("fecha-actual").innerText = fechaTexto;
+    document.getElementById("hora-actual").innerText = horaTexto;
   }
 }
