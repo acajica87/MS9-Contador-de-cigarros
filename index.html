@@ -3,11 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard de Inventario de Cigarros</title>
+    <title>Dashboard Cigarros</title>
+    <!-- Enlace al archivo de estilos CSS -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- BARRA SUPERIOR COMPLETA A LO ANCHO DE LA PÁGINA -->
+    <!-- ==========================================
+       BARRA SUPERIOR COMPLETA (ANCHO DE PÁGINA)
+       ========================================== -->
     <div class="barra-superior-reloj">
       <div class="reloj-contenido">
         <span class="reloj-icono">🕒</span>
@@ -17,16 +20,20 @@
       </div>
     </div>
 
+    <!-- CONTENEDOR PRINCIPAL DEL DASHBOARD -->
     <div class="dashboard-global">
-      <!-- PANEL DE CONTROL (IZQUIERDA) -->
+      <!-- ==========================================
+           PANEL DE CONTROL (IZQUIERDA)
+           ========================================== -->
       <aside class="panel-control">
-        <h2>📋 Cierre de Turno</h2>
+        <h2>📋 Cierre de Inventario</h2>
         <p class="instruccion">
-          Cuente físicamente lo que quedó en el estante al final del día e
-          ingrese las cantidades aquí.
+          Ingrese la cantidad con la que abrió en la mañana y el conteo físico
+          de lo que esta entregando.
         </p>
 
         <form id="formulario-inventario" onsubmit="event.preventDefault()">
+          <!-- 1. SELECCIÓN DE MARCA -->
           <div class="grupo-input">
             <label for="seleccionar-marca">1. Seleccione la Marca</label>
             <select id="seleccionar-marca">
@@ -46,21 +53,31 @@
             </select>
           </div>
 
-          <!-- CORREGIDO: Ambos campos ahora son estrictamente de CONTEO -->
+          <!-- 2. INVENTARIO INICIAL REAL DE LA MAÑANA -->
+          <div class="form-section-separator">
+            A. Inventario Inicial (Mañana)
+          </div>
           <div class="grupo-input">
-            <label for="inventario-cajetillas"
-              >2. Cajetillas Restantes (Conteo)</label
-            >
-            <input type="number" id="inventario-cajetillas" value="0" min="0" />
+            <label for="inicial-cajetillas">Cajetillas Iniciales</label>
+            <input type="number" id="inicial-cajetillas" value="0" min="0" />
+          </div>
+          <div class="grupo-input">
+            <label for="inicial-sueltos">Sueltos Iniciales</label>
+            <input type="number" id="inicial-sueltos" value="0" min="0" />
           </div>
 
+          <!-- 3. CONTEO FÍSICO DEL CAMBIO DE TURNO -->
+          <div class="form-section-separator">B. Inventario Final (Noche)</div>
           <div class="grupo-input">
-            <label for="sueltos-restantes"
-              >3. Cigarros Sueltos Restantes (Conteo)</label
-            >
+            <label for="inventario-cajetillas">Cajetillas Restantes</label>
+            <input type="number" id="inventario-cajetillas" value="0" min="0" />
+          </div>
+          <div class="grupo-input">
+            <label for="sueltos-restantes">Cigarros Sueltos Restantes</label>
             <input type="number" id="sueltos-restantes" value="0" min="0" />
           </div>
 
+          <!-- BOTONES DE ACCIÓN COMPLETA -->
           <button
             type="button"
             class="btn-actualizar"
@@ -78,19 +95,22 @@
         </form>
       </aside>
 
-      <!-- DASHBOARD VISUAL (DERECHA) -->
+      <!-- ==========================================
+           DASHBOARD VISUAL (DERECHA - EL TABLERO DE MAMÁ)
+           ========================================== -->
       <main class="panel-visual">
         <header class="encabezado-dashboard">
           <h1>Existencias y Ventas del Día</h1>
-          <p>Monitoreo por tipo de cigarro en bloques visuales paralelos.</p>
+          <p>Tipo de cigarro</p>
         </header>
 
         <div class="contenedor-marcas" id="dashboard-marcas">
-          <!-- Las tarjetas se generan dinámicamente desde el JS -->
+          <!-- Las 13 tarjetas de las marcas se dibujan automáticamente aquí desde script.js -->
         </div>
       </main>
     </div>
 
+    <!-- Enlace al archivo de lógica JavaScript -->
     <script src="script.js"></script>
   </body>
 </html>

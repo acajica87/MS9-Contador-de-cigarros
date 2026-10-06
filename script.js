@@ -95,47 +95,48 @@ function crearTarjetasEnPantalla() {
   }
 }
 
-// ==========================================
-// 4. LÓGICA MATEMÁTICA BASADA EN CONTEO FÍSICO
+/// ==========================================
+// 4. LÓGICA MATEMÁTICA REAL BASADA EN ENTRADAS
 // ==========================================
 function calcularInventarioCierre() {
   const marca = document.getElementById("seleccionar-marca").value;
 
-  // Captura de lo que se contó físicamente al cierre del día
+  // Captura de datos de la Mañana (Inventario Inicial Real)
+  const inicialCajetillas =
+    parseInt(document.getElementById("inicial-cajetillas").value) || 0;
+  const inicialSueltos =
+    parseInt(document.getElementById("inicial-sueltos").value) || 0;
+
+  // Captura de datos de la Noche (Inventario Final Real)
   const cajetillasRestantesContadas =
     parseInt(document.getElementById("inventario-cajetillas").value) || 0;
   const sueltosRestantesContados =
     parseInt(document.getElementById("sueltos-restantes").value) || 0;
 
-  const inicialCajetillas = inventarioInicial[marca].cajetillas;
-  const inicialSueltos = inventarioInicial[marca].sueltos;
-
-  // --- CÁLCULO DEDUCTIVO POR CONVERSIONES ---
-  // 1. Convertimos todo el stock de la mañana a cigarros sueltos totales
+  // --- CÁLCULO DEDUCTIVO CON DATOS REALES ---
+  // 1. Convertimos todo lo que ingresaste de la mañana a cigarros individuales
   const totalCigarrosMañana =
     inicialCajetillas * CIGARROS_POR_CAJETILLA + inicialSueltos;
 
-  // 2. Convertimos todo el stock que se contó en la noche a cigarros sueltos totales
+  // 2. Convertimos todo lo que ingresaste de la noche a cigarros individuales
   const totalCigarrosNoche =
     cajetillasRestantesContadas * CIGARROS_POR_CAJETILLA +
     sueltosRestantesContados;
 
-  // 3. La diferencia absoluta es el total de cigarros vendidos en el día
+  // 3. La diferencia absoluta es el total real de cigarros vendidos
   const totalCigarrosVendidos = totalCigarrosMañana - totalCigarrosNoche;
 
   if (totalCigarrosVendidos < 0) {
     alert(
-      "¡Error en el conteo! Hay más producto registrado en la noche del que había en la mañana.",
+      "¡Error en el conteo! Hay más producto registrado en la noche del que ingresó en la mañana.",
     );
     return;
   }
 
-  // 4. DEDUCIR CUÁNTAS CAJETILLAS ENTERAS Y CUÁNTOS SUELTOS SE VENDIERON
-  // Las cajetillas vendidas se obtienen dividiendo el total vendido entre 20
+  // 4. DEDUCIR CAJETILLAS COMPLETAS Y UNIDADES SUELTAS VENDIDAS
   const cajetillasVendidasCalculadas = Math.floor(
     totalCigarrosVendidos / CIGARROS_POR_CAJETILLA,
   );
-  // El sobrante de esa división son los cigarros sueltos individuales vendidos
   const sueltosVendidosCalculados =
     totalCigarrosVendidos % CIGARROS_POR_CAJETILLA;
 
@@ -145,7 +146,7 @@ function calcularInventarioCierre() {
   estadoDashboard[marca].sueltosInv = sueltosRestantesContados;
   estadoDashboard[marca].sueltosVen = sueltosVendidosCalculados;
 
-  // Guardado persistente local en el navegador
+  // Guardado permanente local en el navegador
   localStorage.setItem(
     "dashboardCigarrosData",
     JSON.stringify(estadoDashboard),
@@ -153,26 +154,11 @@ function calcularInventarioCierre() {
 
   actualizarPantallaVisual();
 
-  // Limpiar el formulario de captura
+  // Limpiar únicamente los campos de captura para la siguiente marca
+  document.getElementById("inicial-cajetillas").value = 0;
+  document.getElementById("inicial-sueltos").value = 0;
   document.getElementById("inventario-cajetillas").value = 0;
   document.getElementById("sueltos-restantes").value = 0;
-}
-
-function actualizarPantallaVisual() {
-  for (const marca in estadoDashboard) {
-    const data = estadoDashboard[marca];
-
-    if (document.getElementById(`cajetillas-inv-${marca}`)) {
-      document.getElementById(`cajetillas-inv-${marca}`).innerText =
-        data.cajetillasInv;
-      document.getElementById(`cajetillas-ven-${marca}`).innerText =
-        data.cajetillasVen;
-      document.getElementById(`sueltos-inv-${marca}`).innerText =
-        data.sueltosInv;
-      document.getElementById(`sueltos-ven-${marca}`).innerText =
-        data.sueltosVen;
-    }
-  }
 }
 
 // ==========================================
