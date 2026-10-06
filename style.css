@@ -24,6 +24,7 @@ body {
   margin: 0 auto;
 }
 
+/* PANEL IZQUIERDO (FORMULARIO) */
 .panel-control {
   background-color: #ffffff;
   width: 350px;
@@ -51,11 +52,12 @@ body {
   font-weight: bold;
   text-transform: uppercase;
   color: #a45a3c;
-  margin: 20px 0 10px 0;
+  margin: 25px 0 15px 0;
   border-bottom: 1px solid #eae6dc;
   padding-bottom: 4px;
 }
 
+/* PANEL DERECHO (TARJETAS) */
 .panel-visual {
   flex: 1;
 }
@@ -78,7 +80,7 @@ body {
 }
 
 /* ==========================================
-   3. CAMPOS DE TEXTO Y BOTONES
+   3. CAMPOS DE TEXTO E INPUTS
    ========================================== */
 .grupo-input {
   margin-bottom: 15px;
@@ -108,35 +110,56 @@ body {
   border-color: #8c826e;
 }
 
-.btn-actualizar {
+/* ==========================================
+   4. DISEÑO DE BOTONES SEPARADOS Y MODERNOS (UX)
+   ========================================== */
+/* Estilo base para todos los botones para que midan exactamente lo mismo */
+.btn-apertura,
+.btn-actualizar,
+.btn-reporte {
   width: 100%;
-  background-color: #4a453a;
-  color: #ffffff;
-  border: none;
-  padding: 16px;
-  font-size: 16px;
+  padding: 14px;
+  font-size: 15px;
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 10px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+/* Botón de la Mañana: Tono Arena suave */
+.btn-apertura {
+  background-color: #eae6dc;
+  color: #4a453a;
+  border: 1px solid #d5ceb9;
+  margin-bottom: 10px;
+}
+
+.btn-apertura:hover {
+  background-color: #d5ceb9;
+}
+
+/* Botón de la Noche: Marrón Oscuro de alto contraste */
+.btn-actualizar {
+  background-color: #4a453a;
+  color: #ffffff;
+  border: none;
+  margin-bottom: 12px;
 }
 
 .btn-actualizar:hover {
   background-color: #332f28;
 }
 
+/* Botón de Imprimir: Blanco con borde elegante */
 .btn-reporte {
-  width: 100%;
   background-color: #ffffff;
   color: #4a453a;
   border: 2px solid #4a453a;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 12px;
-  transition: all 0.2s ease;
 }
 
 .btn-reporte:hover {
@@ -144,7 +167,7 @@ body {
 }
 
 /* ==========================================
-   4. TARJETAS DE MARCAS (COLUMNAS PARALELAS)
+   5. TARJETAS DE MARCAS (COLUMNAS PARALELAS)
    ========================================== */
 .tarjeta-marca {
   background-color: #ffffff;
@@ -220,7 +243,7 @@ body {
 }
 
 /* ==========================================
-   5. BARRA DE RECONOCIMIENTO SUPERIOR DEL RELOJ
+   6. BARRA SUPERIOR DEL RELOJ REPOSITORIO
    ========================================== */
 .barra-superior-reloj {
   background-color: #ffffff;
@@ -264,7 +287,7 @@ body {
 }
 
 /* ==========================================
-   6. CONTENEDOR HISTORIAL CON SISTEMA DE FILTROS
+   7. CONTENEDOR HISTORIAL CON FILTROS
    ========================================== */
 .contenedor-historial {
   background-color: #ffffff;
@@ -292,7 +315,6 @@ body {
   color: #4a453a;
 }
 
-/* Estilos de la barra interna de filtros */
 .barra-filtros {
   display: flex;
   gap: 20px;

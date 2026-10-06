@@ -223,7 +223,7 @@ function limpiarFiltrosVisuales() {
 }
 
 // ==========================================
-// 7. IMPRESIÓN DE TICKET TÉRMICO (CORREGIDO)
+// 7. IMPRESIÓN DE TICKET TÉRMICO GENERAL CORREGIDO
 // ==========================================
 function imprimirTicketDelDia() {
   const ahora = new Date();
@@ -233,28 +233,29 @@ function imprimirTicketDelDia() {
     day: "numeric",
   });
   const horaTexto = ahora.toLocaleTimeString("es-MX", { hour12: false });
+
   const ventanaTicket = window.open("", "_blank", "width=350,height=600");
 
   let lineasProductos = "";
-  let huboVentas = false;
 
+  // CORRECCIÓN: Quitamos el filtro estricto para que imprima TODAS las marcas con sus datos actuales
   for (const clave in MARCAS_CONFIG) {
-    const data = estadoDashboard[clave];
-    if (data && (data.cajetillasVen > 0 || data.sueltosVen > 0)) {
-      huboVentas = true;
-      // CORRECCIÓN DE LA LÍNEA 234: Envolviendo el HTML con comillas invertidas ` de forma estricta
-      lineasProductos += `
-                <div class="ticket-linea-prod">
-                    <strong>${MARCAS_CONFIG[clave]}</strong><br>
-                    <span>  Vendidos: ${data.cajetillasVen}c / ${data.sueltosVen}s</span><br>
-                    <span class="stock-ticket">  Stock: ${data.cajetillasInv}c / ${data.sueltosInv}s</span>
-                </div>
-                <div class="linea-puntos">--------------------------------</div>
-            `;
-    }
-  }
+    const data = estadoDashboard[clave] || {
+      cajetillasInv: 0,
+      cajetillasVen: 0,
+      sueltosInv: 0,
+      sueltosVen: 0,
+    };
 
-  if (!huboVentas) lineasProductos = "<div>No se registraron ventas hoy.</div>";
+    lineasProductos += `
+            <div class="ticket-linea-prod">
+                <strong>${MARCAS_CONFIG[clave]}</strong><br>
+                <span>  Vendidos: ${data.cajetillasVen}c / ${data.sueltosVen}s</span><br>
+                <span class="stock-ticket">  Stock: ${data.cajetillasInv}c / ${data.sueltosInv}s</span>
+            </div>
+            <div class="linea-puntos">--------------------------------</div>
+        `;
+  }
 
   ventanaTicket.document.write(`
         <html>
@@ -264,30 +265,35 @@ function imprimirTicketDelDia() {
                 body { font-family: 'Courier New', monospace; width: 280px; margin: 0; padding: 10px; color: #000; font-size: 14px; }
                 .text-center { text-align: center; }
                 .titulo { font-size: 16px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-.linea-puntos { border-bottom: 1px dashed #000; margin: 10px 0; }
-.ticket-linea-prod { margin-bottom: 8px; line-height: 1.3; }
-.stock-ticket { font-size: 12px; color: #444; }
-@media print { body { margin: 0; } }
+                .linea-puntos { border-bottom: 1px dashed #000; margin: 10px 0; }
+                .ticket-linea-prod { margin-bottom: 8px; line-height: 1.3; }
+                .stock-ticket { font-size: 12px; color: #444; }
+                @media print { body { margin: 0; } }
+            </style>
+        </head>
+        <body>
+            <div class="text-center titulo">MINISUPER 9</div>
+            <div class="text-center">CORTE DE CIGARROS</div>
+            <div class="linea-puntos">--------------------------------</div>
+            <div>FECHA: ${fechaTexto}</div>
+            <div>HORA : ${horaTexto}</div>
+            <div class="linea-puntos">--------------------------------</div>
+            ${lineasProductos}
+            <div class="text-center" style="margin-top:20px;">¡CORTE EXITOSO!<br>Buen descanso.</div>
+        </body>
+        </html>
+    `);
 
-
-
-MINISUPER 9
-CORTE DE CIGARROS
---------------------------------
-FECHA: ${fechaTexto}
-HORA : ${horaTexto}
---------------------------------
-${lineasProductos}
-¡CORTE EXITOSO!
-Buen descanso.
-
-
-`);
   ventanaTicket.document.close();
-  ventanaTicket.focus();
-  ventanaTicket.print();
-  ventanaTicket.close();
+
+  // Pequeño tiempo de espera de 250 milisegundos para asegurar que el navegador cargue el texto antes de mandar a la impresora
+  setTimeout(() => {
+    ventanaTicket.focus();
+    ventanaTicket.print();
+    ventanaTicket.close();
+  }, 250);
 }
+
 // ==========================================
 // 8. AUXILIARES VISUALES Y RELOJ
 // ==========================================

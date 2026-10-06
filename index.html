@@ -4,10 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Avanzado de Cigarros con Historial</title>
+    <!-- Vinculación del archivo de estilos CSS -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- BARRA SUPERIOR COMPLETA (RELOJ DIGITAL) -->
+    <!-- ==========================================
+       BARRA SUPERIOR COMPLETA (ANCHO DE PÁGINA)
+       ========================================== -->
     <div class="barra-superior-reloj">
       <div class="reloj-contenido">
         <span class="reloj-icono">🕒</span>
@@ -17,18 +20,20 @@
       </div>
     </div>
 
-    <!-- CONTENEDOR CENTRAL DEL DASHBOARD -->
+    <!-- CONTENEDOR CENTRAL DEL DASHBOARD (FLEXBOX) -->
     <div class="dashboard-global">
-      <!-- PANEL DE CONTROL DE CAPTURA (IZQUIERDA) -->
+      <!-- ==========================================
+           PANEL DE CONTROL DE CAPTURA (IZQUIERDA)
+           ========================================== -->
       <aside class="panel-control">
-        <h2>📋 Cierre de Inventario</h2>
+        <h2>📋 Control de Turno</h2>
         <p class="instruccion">
-          Ingrese el inventario de la mañana y el conteo físico de lo que quedó
-          en la noche.
+          Use la Sección A por la mañana para abrir el día. Use la Sección B por
+          la noche para conciliar lo vendido.
         </p>
 
         <form id="formulario-inventario" onsubmit="event.preventDefault()">
-          <!-- Menú de Marcas (Incluye Camel) -->
+          <!-- 1. Menú de Selección de Marca -->
           <div class="grupo-input">
             <label for="seleccionar-marca">1. Seleccione la Marca</label>
             <select id="seleccionar-marca">
@@ -49,6 +54,7 @@
             </select>
           </div>
 
+          <!-- SECCIÓN A: REGISTRO DE MAÑANA -->
           <div class="form-section-separator">
             A. Inventario Inicial (Mañana)
           </div>
@@ -60,7 +66,16 @@
             <label for="inicial-sueltos">Sueltos Iniciales</label>
             <input type="number" id="inicial-sueltos" value="0" min="0" />
           </div>
+          <!-- BOTÓN EXCLUSIVO PARA LA MAÑANA -->
+          <button
+            type="button"
+            class="btn-apertura"
+            onclick="registrarAperturaMañana()"
+          >
+            ☀️ Registrar Apertura (Mañana)
+          </button>
 
+          <!-- SECCIÓN B: REGISTRO DE NOCHE -->
           <div class="form-section-separator">B. Inventario Final (Noche)</div>
           <div class="grupo-input">
             <label for="inventario-cajetillas">Cajetillas Restantes</label>
@@ -71,13 +86,16 @@
             <input type="number" id="sueltos-restantes" value="0" min="0" />
           </div>
 
+          <!-- BOTÓN EXCLUSIVO PARA LA NOCHE -->
           <button
             type="button"
             class="btn-actualizar"
             onclick="calcularInventarioCierre()"
           >
-            Actualizar Dashboard
+            🌙 Calcular Cierre (Noche)
           </button>
+
+          <!-- BOTÓN DE IMPRESIÓN TERMICA -->
           <button
             type="button"
             class="btn-reporte"
@@ -88,7 +106,9 @@
         </form>
       </aside>
 
-      <!-- DASHBOARD VISUAL DE TARJETAS (DERECHA) -->
+      <!-- ==========================================
+           DASHBOARD VISUAL DE TARJETAS (DERECHA)
+           ========================================== -->
       <main class="panel-visual">
         <header class="encabezado-dashboard">
           <h1>Existencias y Ventas del Día</h1>
@@ -96,12 +116,15 @@
         </header>
 
         <div class="contenedor-marcas" id="dashboard-marcas">
-          <!-- Se genera dinámicamente desde script.js -->
+          <!-- Se genera dinámicamente desde el archivo script.js para evitar duplicados -->
         </div>
       </main>
     </div>
+    <!-- FIN DEL CONTENEDOR GLOBAL -->
 
-    <!-- SECCIÓN INFERIOR: HISTORIAL CON FILTROS AVANZADOS -->
+    <!-- ==========================================
+       SECCIÓN INFERIOR: HISTORIAL CON FILTROS AVANZADOS
+       ========================================== -->
     <div class="contenedor-historial">
       <div class="historial-header-filtros">
         <h2>📜 Historial de Movimientos</h2>
@@ -163,12 +186,13 @@
             </tr>
           </thead>
           <tbody id="lista-historial-filas">
-            <!-- Filas dinámicas -->
+            <!-- Las filas se insertarán de forma permanente aquí desde JavaScript -->
           </tbody>
         </table>
       </div>
     </div>
 
+    <!-- Enlace al archivo de lógica JavaScript -->
     <script src="script.js"></script>
   </body>
 </html>
