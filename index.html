@@ -3,14 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard Cigarros</title>
-    <!-- Enlace al archivo de estilos CSS -->
+    <title>Dashboard Avanzado de Cigarros con Historial</title>
+    <!-- Vinculación del archivo de estilos -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- ==========================================
-       BARRA SUPERIOR COMPLETA (ANCHO DE PÁGINA)
-       ========================================== -->
+    <!-- BARRA SUPERIOR COMPLETA (ANCHO DE PÁGINA) -->
     <div class="barra-superior-reloj">
       <div class="reloj-contenido">
         <span class="reloj-icono">🕒</span>
@@ -20,20 +18,18 @@
       </div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL DEL DASHBOARD -->
+    <!-- CONTENEDOR CENTRAL DEL DASHBOARD (FLEXBOX) -->
     <div class="dashboard-global">
-      <!-- ==========================================
-           PANEL DE CONTROL (IZQUIERDA)
-           ========================================== -->
+      <!-- PANEL DE CONTROL DE CAPTURA (IZQUIERDA) -->
       <aside class="panel-control">
         <h2>📋 Cierre de Inventario</h2>
         <p class="instruccion">
-          Ingrese la cantidad con la que abrió en la mañana y el conteo físico
-          de lo que esta entregando.
+          Ingrese el inventario de la mañana y el conteo físico de lo que quedó
+          en la noche.
         </p>
 
         <form id="formulario-inventario" onsubmit="event.preventDefault()">
-          <!-- 1. SELECCIÓN DE MARCA -->
+          <!-- 1. Menú de Marcas -->
           <div class="grupo-input">
             <label for="seleccionar-marca">1. Seleccione la Marca</label>
             <select id="seleccionar-marca">
@@ -53,7 +49,7 @@
             </select>
           </div>
 
-          <!-- 2. INVENTARIO INICIAL REAL DE LA MAÑANA -->
+          <!-- 2. Sección Mañana -->
           <div class="form-section-separator">
             A. Inventario Inicial (Mañana)
           </div>
@@ -66,7 +62,7 @@
             <input type="number" id="inicial-sueltos" value="0" min="0" />
           </div>
 
-          <!-- 3. CONTEO FÍSICO DEL CAMBIO DE TURNO -->
+          <!-- 3. Sección Noche -->
           <div class="form-section-separator">B. Inventario Final (Noche)</div>
           <div class="grupo-input">
             <label for="inventario-cajetillas">Cajetillas Restantes</label>
@@ -77,7 +73,7 @@
             <input type="number" id="sueltos-restantes" value="0" min="0" />
           </div>
 
-          <!-- BOTONES DE ACCIÓN COMPLETA -->
+          <!-- Botones -->
           <button
             type="button"
             class="btn-actualizar"
@@ -90,24 +86,53 @@
             class="btn-reporte"
             onclick="generarReporteDelDia()"
           >
-            📥 Descargar Reporte del Día
+            📥 Descargar Reporte (.TXT)
           </button>
         </form>
       </aside>
 
-      <!-- ==========================================
-           DASHBOARD VISUAL (DERECHA - EL TABLERO DE MAMÁ)
-           ========================================== -->
+      <!-- DASHBOARD VISUAL DE TARJETAS (DERECHA) -->
       <main class="panel-visual">
         <header class="encabezado-dashboard">
           <h1>Existencias y Ventas del Día</h1>
-          <p>Tipo de cigarro</p>
+          <p>Monitoreo por tipo de cigarro en bloques visuales paralelos.</p>
         </header>
 
         <div class="contenedor-marcas" id="dashboard-marcas">
-          <!-- Las 13 tarjetas de las marcas se dibujan automáticamente aquí desde script.js -->
+          <!-- Se genera dinámicamente desde script.js -->
         </div>
       </main>
+    </div>
+    <!-- FIN DEL CONTENEDOR GLOBAL -->
+
+    <!-- SECCIÓN INFERIOR INDEPENDIENTE: PANEL DE REGISTROS HISTÓRICOS -->
+    <div class="contenedor-historial">
+      <div class="historial-header">
+        <h2>📜 Registro Histórico de Movimientos</h2>
+        <button
+          class="btn-borrar-historial"
+          onclick="borrarHistorialPermanente()"
+        >
+          Limpiar Historial
+        </button>
+      </div>
+      <div class="tabla-scroll">
+        <table class="tabla-movimientos">
+          <thead>
+            <tr>
+              <th>Fecha y Hora</th>
+              <th>Marca</th>
+              <th>Stock Inicial (M)</th>
+              <th>Stock Quedó (N)</th>
+              <th>Cajetillas Vendidas</th>
+              <th>Sueltos Vendidos</th>
+            </tr>
+          </thead>
+          <tbody id="lista-historial-filas">
+            <!-- Las filas se insertarán permanentemente aquí -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Enlace al archivo de lógica JavaScript -->

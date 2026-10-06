@@ -19,52 +19,41 @@ const MARCAS_CONFIG = {
 
 const CIGARROS_POR_CAJETILLA = 20;
 
-// Inventario inicial fijo de la mañana para control de deducción (10 cajetillas y 5 sueltos base)
-const inventarioInicial = {};
+// Estado actual del dashboard e Historial permanente
+let estadoDashboard =
+  JSON.parse(localStorage.getItem("dashboardCigarrosData")) || {};
+let registroHistorico =
+  JSON.parse(localStorage.getItem("historialMovimientosCigarros")) || [];
+
+// Inicializar marcas vacías si no existen en la memoria
 for (const clave in MARCAS_CONFIG) {
-  inventarioInicial[clave] = { cajetillas: 10, sueltos: 5 };
-}
-
-// Intentar cargar datos previos guardados en el almacenamiento del navegador
-let estadoDashboard = JSON.parse(localStorage.getItem("dashboardCigarrosData"));
-
-if (!estadoDashboard) {
-  estadoDashboard = {};
-  for (const clave in MARCAS_CONFIG) {
+  if (!estadoDashboard[clave]) {
     estadoDashboard[clave] = {
-      cajetillasInv: 10,
+      cajetillasInv: 0,
       cajetillasVen: 0,
-      sueltosInv: 5,
+      sueltosInv: 0,
       sueltosVen: 0,
     };
   }
 }
 
 // ==========================================
-// 2. CONTROL DE EVENTO DE ARRANQUE (UX)
+// 2. EVENTO DE ARRANQUE E INTERFAZ
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  iniciarReloj();
-  crearTarjetasEnPantalla();
-  actualizarPantallaVisual();
-});
+  // Iniciar reloj dinámico cada segundo
+  actualizarTiempo();
+  setInterval(actualizarTiempo, 1000);
 
-// ==========================================
-// 3. GENERADOR DINÁMICO DE TARJETAS HTML
-// ==========================================
-function crearTarjetasEnPantalla() {
+  // Crear la estructura de tarjetas en el tablero
   const contenedor = document.getElementById("dashboard-marcas");
-  if (!contenedor) return;
-  contenedor.innerHTML = "";
-
-  for (const clave in MARCAS_CONFIG) {
-    const nombreLegible = MARCAS_CONFIG[clave];
-    const tarjetaHTML = `
+  if (contenedor) {
+    contenedor.innerHTML = Object.keys(MARCAS_CONFIG)
+      .map(
+        (clave) => `
             <div class="tarjeta-marca">
-                <h2 class="titulo-marca">${nombreLegible}</h2>
+                <h2 class="titulo-marca">${MARCAS_CONFIG[clave]}</h2>
                 <div class="tarjeta-marca-contenido">
-                    
-                    <!-- Bloque de Cajetillas (Izquierda con Relieve) -->
                     <div class="sub-seccion bloque-cajetillas">
                         <div class="bloque-valor">
                             <span class="numero-grande" id="cajetillas-inv-${clave}">0</span>
@@ -75,8 +64,6 @@ function crearTarjetasEnPantalla() {
                             <span class="etiqueta-chica">Vendidas</span>
                         </div>
                     </div>
-
-                    <!-- Bloque de Sueltos (Derecha Plano Contrastante) -->
                     <div class="sub-seccion bloque-sueltos">
                         <div class="bloque-valor">
                             <span class="numero-grande" id="sueltos-inv-${clave}">0</span>
@@ -87,74 +74,87 @@ function crearTarjetasEnPantalla() {
                             <span class="etiqueta-chica">Vendidos</span>
                         </div>
                     </div>
-                    
                 </div>
             </div>
-        `;
-    contenedor.innerHTML += tarjetaHTML;
+        `,
+      )
+      .join("");
   }
-}
 
-/// ==========================================
-// 4. LÓGICA MATEMÁTICA REAL BASADA EN ENTRADAS
+  actualizarPantallaVisual();
+  mostrarHistorialEnTabla();
+});
+
+// ==========================================
+// 3. LÓGICA DE AUDITORÍA Y CÁLCULO
 // ==========================================
 function calcularInventarioCierre() {
   const marca = document.getElementById("seleccionar-marca").value;
 
-  // Captura de datos de la Mañana (Inventario Inicial Real)
   const inicialCajetillas =
     parseInt(document.getElementById("inicial-cajetillas").value) || 0;
   const inicialSueltos =
     parseInt(document.getElementById("inicial-sueltos").value) || 0;
-
-  // Captura de datos de la Noche (Inventario Final Real)
   const cajetillasRestantesContadas =
     parseInt(document.getElementById("inventario-cajetillas").value) || 0;
   const sueltosRestantesContados =
     parseInt(document.getElementById("sueltos-restantes").value) || 0;
 
-  // --- CÁLCULO DEDUCTIVO CON DATOS REALES ---
-  // 1. Convertimos todo lo que ingresaste de la mañana a cigarros individuales
   const totalCigarrosMañana =
     inicialCajetillas * CIGARROS_POR_CAJETILLA + inicialSueltos;
-
-  // 2. Convertimos todo lo que ingresaste de la noche a cigarros individuales
   const totalCigarrosNoche =
     cajetillasRestantesContadas * CIGARROS_POR_CAJETILLA +
     sueltosRestantesContados;
-
-  // 3. La diferencia absoluta es el total real de cigarros vendidos
   const totalCigarrosVendidos = totalCigarrosMañana - totalCigarrosNoche;
 
   if (totalCigarrosVendidos < 0) {
     alert(
-      "¡Error en el conteo! Hay más producto registrado en la noche del que ingresó en la mañana.",
+      "¡Error en el conteo! Hay más producto en la noche del que ingresó en la mañana.",
     );
     return;
   }
 
-  // 4. DEDUCIR CAJETILLAS COMPLETAS Y UNIDADES SUELTAS VENDIDAS
   const cajetillasVendidasCalculadas = Math.floor(
     totalCigarrosVendidos / CIGARROS_POR_CAJETILLA,
   );
   const sueltosVendidosCalculados =
     totalCigarrosVendidos % CIGARROS_POR_CAJETILLA;
 
-  // Guardar los nuevos valores en nuestro estado del Dashboard
-  estadoDashboard[marca].cajetillasInv = cajetillasRestantesContadas;
-  estadoDashboard[marca].cajetillasVen = cajetillasVendidasCalculadas;
-  estadoDashboard[marca].sueltosInv = sueltosRestantesContados;
-  estadoDashboard[marca].sueltosVen = sueltosVendidosCalculados;
+  // Guardar en las variables globales
+  estadoDashboard[marca] = {
+    cajetillasInv: cajetillasRestantesContadas,
+    cajetillasVen: cajetillasVendidasCalculadas,
+    sueltosInv: sueltosRestantesContados,
+    sueltosVen: sueltosVendidosCalculados,
+  };
 
-  // Guardado permanente local en el navegador
+  // Añadir fila al historial acumulativo
+  const ahora = new Date();
+  const tiempoMarcado = `${ahora.toLocaleDateString("es-MX")} | ${ahora.toLocaleTimeString("es-MX", { hour12: false })}`;
+
+  registroHistorico.unshift({
+    fecha: tiempoMarcado,
+    nombre: MARCAS_CONFIG[marca],
+    inicial: `${inicialCajetillas}c / ${inicialSueltos}s`,
+    final: `${cajetillasRestantesContadas}c / ${sueltosRestantesContados}s`,
+    cajetillasV: cajetillasVendidasCalculadas,
+    sueltosV: sueltosVendidosCalculados,
+  });
+
+  // Guardar en la base de datos del navegador
   localStorage.setItem(
     "dashboardCigarrosData",
     JSON.stringify(estadoDashboard),
   );
+  localStorage.setItem(
+    "historialMovimientosCigarros",
+    JSON.stringify(registroHistorico),
+  );
 
   actualizarPantallaVisual();
+  mostrarHistorialEnTabla();
 
-  // Limpiar únicamente los campos de captura para la siguiente marca
+  // Limpiar formulario de captura
   document.getElementById("inicial-cajetillas").value = 0;
   document.getElementById("inicial-sueltos").value = 0;
   document.getElementById("inventario-cajetillas").value = 0;
@@ -162,11 +162,41 @@ function calcularInventarioCierre() {
 }
 
 // ==========================================
-// 5. RELOJ DIGITAL Y FECHA EN TIEMPO REAL
+// 4. AUXILIARES DE RENDERIZADO VISUAL
 // ==========================================
-function iniciarReloj() {
-  actualizarTiempo();
-  setInterval(actualizarTiempo, 1000);
+function actualizarPantallaVisual() {
+  for (const marca in estadoDashboard) {
+    const data = estadoDashboard[marca];
+    if (document.getElementById(`cajetillas-inv-${marca}`)) {
+      document.getElementById(`cajetillas-inv-${marca}`).innerText =
+        data.cajetillasInv;
+      document.getElementById(`cajetillas-ven-${marca}`).innerText =
+        data.cajetillasVen;
+      document.getElementById(`sueltos-inv-${marca}`).innerText =
+        data.sueltosInv;
+      document.getElementById(`sueltos-ven-${marca}`).innerText =
+        data.sueltosVen;
+    }
+  }
+}
+
+function mostrarHistorialEnTabla() {
+  const tbody = document.getElementById("lista-historial-filas");
+  if (!tbody) return;
+  tbody.innerHTML = registroHistorico
+    .map(
+      (mov) => `
+        <tr>
+            <td style="font-family: monospace; font-size:13px;">${mov.fecha}</td>
+            <td style="font-weight: 600;">${mov.nombre}</td>
+            <td>${mov.inicial}</td>
+            <td>${mov.final}</td>
+            <td style="color:#a45a3c; font-weight:bold;">${mov.cajetillasV}</td>
+            <td style="color:#a45a3c; font-weight:bold;">${mov.sueltosV}</td>
+        </tr>
+    `,
+    )
+    .join("");
 }
 
 function actualizarTiempo() {
@@ -179,72 +209,68 @@ function actualizarTiempo() {
   };
   let fechaTexto = ahora.toLocaleDateString("es-MX", opcionesFecha);
   fechaTexto = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
-  const horaTexto = ahora.toLocaleTimeString("es-MX", { hour12: false });
 
   if (document.getElementById("fecha-actual")) {
     document.getElementById("fecha-actual").innerText = fechaTexto;
-    document.getElementById("hora-actual").innerText = horaTexto;
+    document.getElementById("hora-actual").innerText = ahora.toLocaleTimeString(
+      "es-MX",
+      { hour12: false },
+    );
   }
 }
-// ==========================================
-// 6. GENERACIÓN DE REPORTE DEL DÍA CORREGIDO
-// ==========================================
+
+function borrarHistorialPermanente() {
+  if (
+    confirm(
+      "¿Está seguro de que desea borrar todos los registros históricos? Esta acción no se puede deshacer.",
+    )
+  ) {
+    registroHistorico = [];
+    localStorage.removeItem("historialMovimientosCigarros");
+    mostrarHistorialEnTabla();
+  }
+}
+
 function generarReporteDelDia() {
   const ahora = new Date();
-  const opcionesFecha = { year: "numeric", month: "long", day: "numeric" };
-  const fechaTexto = ahora.toLocaleDateString("es-MX", opcionesFecha);
-  const horaTexto = ahora.toLocaleTimeString("es-MX", { hour12: false });
+  const fechaTexto = ahora.toLocaleDateString("es-MX", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   let contenidoReporte = `=========================================\n`;
   contenidoReporte += `       REPORTE DE MOVIMIENTOS DEL DÍA    \n`;
   contenidoReporte += `=========================================\n`;
-  contenidoReporte += `Fecha: ${fechaTexto}\n`;
-  contenidoReporte += `Hora de Corte: ${horaTexto}\n`;
-  contenidoReporte += `-----------------------------------------\n\n`;
+  contenidoReporte += `Fecha: ${fechaTexto}\n\n`;
 
   let huboMovimientos = false;
-
-  // Recorremos las 13 marcas configuradas
   for (const clave in MARCAS_CONFIG) {
-    const nombreMarca = MARCAS_CONFIG[clave];
-
-    // CORRECCIÓN PROTECTORA: Si el estado de la marca no existe en la memoria local,
-    // le creamos una plantilla vacía temporal con ceros para que no truene el código.
     const data = estadoDashboard[clave] || {
-      cajetillasInv: 10,
+      cajetillasInv: 0,
       cajetillasVen: 0,
-      sueltosInv: 5,
+      sueltosInv: 0,
       sueltosVen: 0,
     };
-
-    // Evaluamos los movimientos usando la variable segura "data"
     if (data.cajetillasVen > 0 || data.sueltosVen > 0) {
       huboMovimientos = true;
-      contenidoReporte += `📌 MARCA: ${nombreMarca}\n`;
+      contenidoReporte += `📌 MARCA: ${MARCAS_CONFIG[clave]}\n`;
       contenidoReporte += `   - Cajetillas Vendidas: ${data.cajetillasVen}\n`;
       contenidoReporte += `   - Cigarros Sueltos Vendidos: ${data.sueltosVen}\n`;
-      contenidoReporte += `   - STOCK ACTUAL EN TIENDA: ${data.cajetillasInv} Cajetillas y ${data.sueltosInv} Sueltos\n`;
+      contenidoReporte += `   - STOCK ACTUAL: ${data.cajetillasInv}c y ${data.sueltosInv}s\n`;
       contenidoReporte += `-----------------------------------------\n`;
     }
   }
 
-  if (!huboMovimientos) {
-    contenidoReporte += `No se registraron ventas ni movimientos de inventario el día de hoy.\n`;
-  }
+  if (!huboMovimientos)
+    contenidoReporte += `No se registraron ventas el día de hoy.\n`;
 
-  contenidoReporte += `\n=========================================\n`;
-  contenidoReporte += `         Fin del Reporte - ¡Buen descanso! \n`;
-
-  // OPERACIÓN DE DESCARGA AUTOMÁTICA
   const blob = new Blob([contenidoReporte], {
     type: "text/plain;charset=utf-8",
   });
   const enlaceDescarga = document.createElement("a");
-  const nombreArchivo = `Reporte_Cigarros_${fechaTexto.replace(/ /g, "_")}.txt`;
-
   enlaceDescarga.href = URL.createObjectURL(blob);
-  enlaceDescarga.download = nombreArchivo;
-
+  enlaceDescarga.download = `Reporte_${fechaTexto.replace(/ /g, "_")}.txt`;
   document.body.appendChild(enlaceDescarga);
   enlaceDescarga.click();
   document.body.removeChild(enlaceDescarga);

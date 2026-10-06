@@ -8,7 +8,6 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* FONDO GLOBAL: Tono arena/crema muy suave para descansar la vista */
 body {
   background-color: #f7f5f0;
   color: #2b2b2b;
@@ -25,7 +24,7 @@ body {
   margin: 0 auto;
 }
 
-/* PANEL DE CONTROL DE VENTAS (FORMULARIO IZQUIERDO) */
+/* PANEL IZQUIERDO */
 .panel-control {
   background-color: #ffffff;
   width: 350px;
@@ -48,7 +47,17 @@ body {
   line-height: 1.4;
 }
 
-/* PANEL VISUAL (DERECHA - EL TABLERO DE MAMÁ) */
+.form-section-separator {
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #a45a3c;
+  margin: 20px 0 10px 0;
+  border-bottom: 1px solid #eae6dc;
+  padding-bottom: 4px;
+}
+
+/* PANEL DERECHO */
 .panel-visual {
   flex: 1;
 }
@@ -64,35 +73,31 @@ body {
   margin-bottom: 30px;
 }
 
-/* CUADRÍCULA DE TARJETAS POR MARCA */
 .contenedor-marcas {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(450px, 1fr)
-  ); /* Ancho mínimo mayor para dar espacio a las columnas */
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
   gap: 25px;
 }
 
 /* ==========================================
-   3. ENTRADAS DE TEXTO Y BOTONES (UX ENTRADA)
+   3. CAMPOS DE TEXTO Y BOTONES
    ========================================== */
 .grupo-input {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .grupo-input label {
   display: block;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .grupo-input select,
 .grupo-input input {
   width: 100%;
-  padding: 14px;
-  font-size: 18px; /* Texto grande para escribir fácil */
+  padding: 12px;
+  font-size: 16px;
   border: 2px solid #e0dacb;
   border-radius: 8px;
   background-color: #faf9f6;
@@ -105,10 +110,9 @@ body {
   border-color: #8c826e;
 }
 
-/* BOTÓN DE ACCIÓN GIGANTE */
 .btn-actualizar {
   width: 100%;
-  background-color: #4a453a; /* Tono tierra oscuro, elegante y visible */
+  background-color: #4a453a;
   color: #ffffff;
   border: none;
   padding: 16px;
@@ -116,7 +120,6 @@ body {
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
   margin-top: 10px;
 }
 
@@ -124,133 +127,6 @@ body {
   background-color: #332f28;
 }
 
-/* ==========================================
-   4. TARJETAS DE MARCAS Y VALORES (UX SALIDA)
-   ========================================== */
-.tarjeta-marca {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-  border: 1px solid #eae6dc;
-}
-
-.titulo-marca {
-  font-size: 22px;
-  color: #4a453a;
-  margin-bottom: 18px;
-  text-align: center;
-  border-bottom: 2px solid #f7f5f0;
-  padding-bottom: 8px;
-}
-
-/* CONTENEDORES INTERNOS MODULARES EXCLUSIVOS */
-/* CORRECCIÓN AQUÍ: Agregamos display flex y gap para que se acomoden en 2 columnas lado a lado */
-.tarjeta-marca-contenido {
-  display: flex;
-  gap: 15px;
-}
-
-.sub-seccion {
-  flex: 1; /* Esto obliga a que ambos bloques midan exactamente lo mismo de ancho */
-  display: flex;
-  justify-content: space-around;
-  padding: 16px;
-  border-radius: 12px;
-}
-
-/* SECCIÓN CAJETILLAS: Resalta al frente con relieve y sombra color tierra */
-.bloque-cajetillas {
-  background-color: #ffffff;
-  border: 1px solid #e3decb;
-  box-shadow: 0 6px 14px rgba(74, 69, 58, 0.08);
-}
-
-/* SECCIÓN SUELTOS: Fondo plano y opaco que descansa atrás */
-.bloque-sueltos {
-  background-color: #f2efe6;
-  border: 1px dashed #d5ceb9;
-  box-shadow: none;
-}
-
-/* MÉTRICAS INDIVIDUALES INTERNAS */
-.bloque-valor {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Línea sutil divisoria vertical interna */
-.divider {
-  border-left: 1px solid rgba(140, 130, 110, 0.15);
-}
-
-/* NÚMEROS MASIVOS PARA LA VISTA DE TU MAMÁ */
-.numero-grande {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 4px;
-}
-
-/* Color sutil marrón/óxido para distinguir ventas de existencias rápidamente */
-.color-venda {
-  color: #a45a3c !important;
-}
-
-.etiqueta-chica {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #8c826e;
-  text-align: center;
-}
-/* ==========================================
-   5. BARRA DE RELOJ SUPERIOR EXTENDIDA (ANCHO COMPLETO)
-   ========================================== */
-.barra-superior-reloj {
-  background-color: #ffffff;
-  width: 100%;
-  padding: 15px 30px;
-  margin-bottom: 25px;
-  border-radius: 12px;
-  border: 1px solid #eae6dc;
-  box-shadow: 0 2px 8px rgba(74, 69, 58, 0.04);
-}
-
-.reloj-contenido {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center; /* Centra el contenido a lo largo de la barra */
-  align-items: center;
-  gap: 12px;
-  font-size: 18px; /* Texto más grande y visible */
-  font-weight: 600;
-  color: #4a453a;
-}
-
-.reloj-icono {
-  font-size: 20px;
-}
-
-#hora-actual {
-  background-color: #f2efe6;
-  padding: 4px 12px;
-  border-radius: 8px;
-  color: #1a1a1a;
-  font-family: monospace; /* Evita que los números bailen */
-  letter-spacing: 1px;
-}
-
-.separador-barra {
-  color: #d5ceb9;
-  font-weight: 300;
-  margin: 0 5px;
-}
-/* BOTÓN DE REPORTE */
 .btn-reporte {
   width: 100%;
   background-color: #ffffff;
@@ -267,6 +143,198 @@ body {
 
 .btn-reporte:hover {
   background-color: #f2efe6;
-  border-color: #332f28;
-  color: #332f28;
+}
+
+/* ==========================================
+   4. TARJETAS DE MARCAS (UX COLUMNAS HORIZONTALES)
+   ========================================== */
+.tarjeta-marca {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  border: 1px solid #eae6dc;
+}
+
+.titulo-marca {
+  font-size: 20px;
+  color: #4a453a;
+  margin-bottom: 15px;
+  text-align: center;
+  border-bottom: 2px solid #f7f5f0;
+  padding-bottom: 8px;
+}
+
+.tarjeta-marca-contenido {
+  display: flex;
+  gap: 15px;
+}
+
+.sub-seccion {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.bloque-cajetillas {
+  background-color: #ffffff;
+  border: 1px solid #e3decb;
+  box-shadow: 0 6px 14px rgba(74, 69, 58, 0.08);
+}
+
+.bloque-sueltos {
+  background-color: #f2efe6;
+  border: 1px dashed #d5ceb9;
+  box-shadow: none;
+}
+
+.bloque-valor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.divider {
+  border-left: 1px solid rgba(140, 130, 110, 0.15);
+}
+
+.numero-grande {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.color-venda {
+  color: #a45a3c !important;
+}
+
+.etiqueta-chica {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8c826e;
+  text-align: center;
+}
+
+/* ==========================================
+   5. BARRA DE RECONOCIMIENTO SUPERIOR DEL RELOJ
+   ========================================== */
+.barra-superior-reloj {
+  background-color: #ffffff;
+  width: 100%;
+  padding: 15px 30px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  border: 1px solid #eae6dc;
+  box-shadow: 0 2px 8px rgba(74, 69, 58, 0.04);
+}
+
+.reloj-contenido {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #4a453a;
+}
+
+.reloj-icono {
+  font-size: 20px;
+}
+
+#hora-actual {
+  background-color: #f2efe6;
+  padding: 4px 12px;
+  border-radius: 8px;
+  color: #1a1a1a;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.separador-barra {
+  color: #d5ceb9;
+  font-weight: 300;
+  margin: 0 5px;
+}
+
+/* ==========================================
+   6. CONTENEDOR DE REGISTROS HISTÓRICOS
+   ========================================== */
+.contenedor-historial {
+  background-color: #ffffff;
+  max-width: 1200px;
+  margin: 30px auto 0 auto;
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid #eae6dc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.historial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f7f5f0;
+  padding-bottom: 12px;
+}
+
+.historial-header h2 {
+  font-size: 20px;
+  color: #4a453a;
+}
+
+.btn-borrar-historial {
+  background-color: transparent;
+  color: #a45a3c;
+  border: 1px solid #a45a3c;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-borrar-historial:hover {
+  background-color: #fcf8f6;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.tabla-movimientos {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.tabla-movimientos th {
+  background-color: #f2efe6;
+  color: #4a453a;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tabla-movimientos td {
+  padding: 14px 12px;
+  font-size: 14px;
+  color: #2b2b2b;
+  border-bottom: 1px solid #f7f5f0;
+}
+
+.tabla-movimientos tr:hover td {
+  background-color: #faf9f6;
 }
