@@ -1,5 +1,5 @@
 // ==========================================
-// 1. CONFIGURACIÓN ACTUALIZADA CON CAMEL
+// 1. CONFIGURACIÓN DE LAS 14 MARCAS REALES
 // ==========================================
 const MARCAS_CONFIG = {
   camel: "Camel",
@@ -20,12 +20,13 @@ const MARCAS_CONFIG = {
 
 const CIGARROS_POR_CAJETILLA = 20;
 
+// Cargar bases de datos persistentes del navegador
 let estadoDashboard =
   JSON.parse(localStorage.getItem("dashboardCigarrosData")) || {};
 let registroHistorico =
   JSON.parse(localStorage.getItem("historialMovimientosCigarros")) || [];
 
-// Asegurar que cada marca exista en el objeto de datos
+// Asegurar inicialización limpia en 0 si no hay memoria previa
 for (const clave in MARCAS_CONFIG) {
   if (!estadoDashboard[clave]) {
     estadoDashboard[clave] = {
@@ -37,9 +38,6 @@ for (const clave in MARCAS_CONFIG) {
   }
 }
 
-// ==========================================
-// 2. CONTROL DE ARRANQUE E INTERFAZ
-// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
   iniciarReloj();
   crearTarjetasEnPantalla();
@@ -47,24 +45,17 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarHistorialEnTabla();
 });
 
-// ==========================================
-// 3. GENERADOR DINÁMICO DE TARJETAS HTML
-// ==========================================
 function crearTarjetasEnPantalla() {
   const contenedor = document.getElementById("dashboard-marcas");
   if (!contenedor) return;
-
-  contenedor.innerHTML = ""; // Limpiar antes de renderizar
+  contenedor.innerHTML = "";
 
   for (const clave in MARCAS_CONFIG) {
     const nombreLegible = MARCAS_CONFIG[clave];
-
     const tarjetaHTML = `
             <div class="tarjeta-marca">
                 <h2 class="titulo-marca">${nombreLegible}</h2>
                 <div class="tarjeta-marca-contenido">
-                    
-                    <!-- Bloque de Cajetillas (Izquierda) -->
                     <div class="sub-seccion bloque-cajetillas">
                         <div class="bloque-valor">
                             <span class="numero-grande" id="cajetillas-inv-${clave}">0</span>
@@ -75,8 +66,6 @@ function crearTarjetasEnPantalla() {
                             <span class="etiqueta-chica">Vendidas</span>
                         </div>
                     </div>
-
-                    <!-- Bloque de Sueltos (Derecha) -->
                     <div class="sub-seccion bloque-sueltos">
                         <div class="bloque-valor">
                             <span class="numero-grande" id="sueltos-inv-${clave}">0</span>
@@ -87,7 +76,6 @@ function crearTarjetasEnPantalla() {
                             <span class="etiqueta-chica">Vendidos</span>
                         </div>
                     </div>
-                    
                 </div>
             </div>
         `;
@@ -96,19 +84,46 @@ function crearTarjetasEnPantalla() {
 }
 
 // ==========================================
-// 4. LÓGICA MATEMÁTICA REAL BASADA EN ENTRADAS
+// 4. REGISTRO DE APERTURA (MAÑANA)
 // ==========================================
-function calcularInventarioCierre() {
+function registrarAperturaMañana() {
   const marca = document.getElementById("seleccionar-marca").value;
-
   const inicialCajetillas =
     parseInt(document.getElementById("inicial-cajetillas").value) || 0;
   const inicialSueltos =
     parseInt(document.getElementById("inicial-sueltos").value) || 0;
+
+  estadoDashboard[marca] = {
+    cajetillasInv: inicialCajetillas,
+    cajetillasVen: 0,
+    sueltosInv: inicialSueltos,
+    sueltosVen: 0,
+  };
+
+  localStorage.setItem(
+    "dashboardCigarrosData",
+    JSON.stringify(estadoDashboard),
+  );
+  actualizarPantallaVisual();
+
+  document.getElementById("inicial-cajetillas").value = 0;
+  document.getElementById("inicial-sueltos").value = 0;
+
+  alert(`¡Inventario inicial cargado con éxito para ${MARCAS_CONFIG[marca]}!`);
+}
+
+// ==========================================
+// 5. REGISTRO DE CIERRE (NOCHE)
+// ==========================================
+function calcularInventarioCierre() {
+  const marca = document.getElementById("seleccionar-marca").value;
   const cajetillasRestantesContadas =
     parseInt(document.getElementById("inventario-cajetillas").value) || 0;
   const sueltosRestantesContados =
     parseInt(document.getElementById("sueltos-restantes").value) || 0;
+
+  const inicialCajetillas = estadoDashboard[marca].cajetillasInv;
+  const inicialSueltos = estadoDashboard[marca].sueltosInv;
 
   const totalCigarrosMañana =
     inicialCajetillas * CIGARROS_POR_CAJETILLA + inicialSueltos;
@@ -119,7 +134,7 @@ function calcularInventarioCierre() {
 
   if (totalCigarrosVendidos < 0) {
     alert(
-      "¡Error en el conteo! Hay más producto en la noche del que ingresó en la mañana.",
+      "¡Error en el conteo! El inventario de la noche supera al registrado en la mañana.",
     );
     return;
   }
@@ -130,7 +145,6 @@ function calcularInventarioCierre() {
   const sueltosVendidosCalculados =
     totalCigarrosVendidos % CIGARROS_POR_CAJETILLA;
 
-  // Guardar en el objeto de datos del Dashboard
   estadoDashboard[marca] = {
     cajetillasInv: cajetillasRestantesContadas,
     cajetillasVen: cajetillasVendidasCalculadas,
@@ -138,7 +152,6 @@ function calcularInventarioCierre() {
     sueltosVen: sueltosVendidosCalculados,
   };
 
-  // Crear fila con marca de tiempo exacta para los filtros
   const ahora = new Date();
   const dia = String(ahora.getDate()).padStart(2, "0");
   const mes = String(ahora.getMonth() + 1).padStart(2, "0");
@@ -155,7 +168,6 @@ function calcularInventarioCierre() {
     fechaFiltro: `${año}-${mes}-${dia}`,
   });
 
-  // Guardar permanentemente en LocalStorage
   localStorage.setItem(
     "dashboardCigarrosData",
     JSON.stringify(estadoDashboard),
@@ -168,15 +180,12 @@ function calcularInventarioCierre() {
   actualizarPantallaVisual();
   mostrarHistorialEnTabla();
 
-  // Limpiar formulario de captura
-  document.getElementById("inicial-cajetillas").value = 0;
-  document.getElementById("inicial-sueltos").value = 0;
   document.getElementById("inventario-cajetillas").value = 0;
   document.getElementById("sueltos-restantes").value = 0;
 }
 
 // ==========================================
-// 5. SISTEMA DE FILTRADO AVANZADO
+// 6. SISTEMA DE FILTRADO AVANZADO
 // ==========================================
 function mostrarHistorialEnTabla() {
   const tbody = document.getElementById("lista-historial-filas");
@@ -191,12 +200,10 @@ function mostrarHistorialEnTabla() {
     return coincideFecha && coincideMarca;
   });
 
-  tbody.innerHTML = ""; // Limpiar la tabla anterior
-
-  // Renderizar las filas filtradas
+  tbody.innerHTML = "";
   for (let i = 0; i < registrosFiltrados.length; i++) {
     const mov = registrosFiltrados[i];
-    const filaHTML = `
+    tbody.innerHTML += `
             <tr>
                 <td style="font-family: monospace; font-size:13px;">${mov.fecha}</td>
                 <td style="font-weight: 600;">${mov.nombre}</td>
@@ -206,7 +213,6 @@ function mostrarHistorialEnTabla() {
                 <td style="color:#a45a3c; font-weight:bold;">${mov.sueltosV}</td>
             </tr>
         `;
-    tbody.innerHTML += filaHTML;
   }
 }
 
@@ -217,7 +223,7 @@ function limpiarFiltrosVisuales() {
 }
 
 // ==========================================
-// 6. IMPRESIÓN DE TICKET TÉRMICO (80mm)
+// 7. IMPRESIÓN DE TICKET TÉRMICO (CORREGIDO)
 // ==========================================
 function imprimirTicketDelDia() {
   const ahora = new Date();
@@ -227,7 +233,6 @@ function imprimirTicketDelDia() {
     day: "numeric",
   });
   const horaTexto = ahora.toLocaleTimeString("es-MX", { hour12: false });
-
   const ventanaTicket = window.open("", "_blank", "width=350,height=600");
 
   let lineasProductos = "";
@@ -237,6 +242,7 @@ function imprimirTicketDelDia() {
     const data = estadoDashboard[clave];
     if (data && (data.cajetillasVen > 0 || data.sueltosVen > 0)) {
       huboVentas = true;
+      // CORRECCIÓN DE LA LÍNEA 234: Envolviendo el HTML con comillas invertidas ` de forma estricta
       lineasProductos += `
                 <div class="ticket-linea-prod">
                     <strong>${MARCAS_CONFIG[clave]}</strong><br>
@@ -258,8 +264,8 @@ function imprimirTicketDelDia() {
                 body { font-family: 'Courier New', monospace; width: 280px; margin: 0; padding: 10px; color: #000; font-size: 14px; }
                 .text-center { text-align: center; }
                 .titulo { font-size: 16px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-                .linea-puntos { border-bottom: 1px dashed #000; margin: 10px 0; }
-                .ticket-linea-prod { margin-bottom: 8px; line-height: 1.3; }
+.linea-puntos { border-bottom: 1px dashed #000; margin: 10px 0; }
+.ticket-linea-prod { margin-bottom: 8px; line-height: 1.3; }
 .stock-ticket { font-size: 12px; color: #444; }
 @media print { body { margin: 0; } }
 
@@ -283,7 +289,7 @@ Buen descanso.
   ventanaTicket.close();
 }
 // ==========================================
-// 7. AUXILIARES VISUALES Y RELOJ
+// 8. AUXILIARES VISUALES Y RELOJ
 // ==========================================
 function actualizarPantallaVisual() {
   for (const marca in estadoDashboard) {
